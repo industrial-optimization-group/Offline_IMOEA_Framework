@@ -1,0 +1,11 @@
+2020-11-24 23:59:57,261 - matplotlib.pyplot - DEBUG - Loaded backend module://ipykernel.pylab.backend_inline version unknown.
+2020-11-24 23:59:57,271 - matplotlib.pyplot - DEBUG - Loaded backend module://ipykernel.pylab.backend_inline version unknown.
+2020-11-25 00:01:16,530 - GP - INFO - initializing Y
+2020-11-25 00:01:16,532 - GP - INFO - initializing inference method
+2020-11-25 00:01:16,532 - GP - INFO - adding kernel and likelihood as parameters
+2020-11-25 00:01:16,581 - GP - INFO - initializing Y
+2020-11-25 00:01:16,582 - GP - INFO - initializing inference method
+2020-11-25 00:01:16,583 - GP - INFO - adding kernel and likelihood as parameters
+2020-11-25 00:01:16,697 - GP - INFO - initializing Y
+2020-11-25 00:01:16,698 - GP - INFO - initializing inference method
+2020-11-25 00:01:16,699 - GP - INFO - adding kernel and likelihood as parameters

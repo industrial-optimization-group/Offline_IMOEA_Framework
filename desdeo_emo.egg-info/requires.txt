@@ -1,0 +1,11 @@
+desdeo-problem<0.14.0,>=0.13.0
+desdeo-tools<0.3.0,>=0.2.1
+diversipy<0.9.0,>=0.8.0
+numpy<2.0,>=1.16
+optproblems<2.0,>=1.2
+pandas<0.26,>=0.25
+plotly<5.0,>=4.1
+pyDOE<0.4.0,>=0.3.8
+pygmo<3.0,>=2.10
+scikit-learn<0.22.0,>=0.21.2
+scipy<2.0,>=1.2
