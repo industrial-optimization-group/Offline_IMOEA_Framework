@@ -6,8 +6,27 @@ import os
 from joblib import Parallel, delayed
 import datetime
 
+
+data_folder = '/home/amrzr/Work/Codes/data'
+#main_directory = 'Offline_Prob_DDMOPP3'
+#main_directory = 'Tests_Probabilistic_Finalx_new'
+#main_directory = 'Tests_additional_obj1'
+#main_directory = 'Tests_Gpy_1'
+#main_directory = 'Tests_new_adapt'
+#main_directory = 'Tests_toys'
+#main_directory = 'Test_Gpy3'
+#main_directory = 'Test_DR_4'  #DR = Datatset Reduction
+main_directory = 'Test_DR_Scratch'
+#main_directory = 'Test_DR_CSC_1'
+#main_directory = 'Test_RF'
+#main_directory = 'Test_DR_CSC_Final_1'
+init_folder = data_folder + '/initial_samples_old'
+
+
+
 #convert_to_mat = True
 evaluate_data = True
+#evaluate_data = False
 #import Telegram_bot.telegram_bot_messenger as tgm
 #dims = [5,8,10] #,8]
 #dims = [2, 5, 7, 10]
@@ -37,19 +56,7 @@ objs(9) = -min_VCMAX;
 objs(10) = PFPF;
 """
 
-#main_directory = 'Offline_Prob_DDMOPP3'
-#main_directory = 'Tests_Probabilistic_Finalx_new'
-#main_directory = 'Tests_additional_obj1'
-#main_directory = 'Tests_Gpy_1'
-#main_directory = 'Tests_new_adapt'
-#main_directory = 'Tests_toys'
-#main_directory = 'Test_Gpy3'
-#main_directory = 'Test_DR_4'  #DR = Datatset Reduction
-main_directory = 'Test_DR_Scratch'
-#main_directory = 'Test_DR_CSC_1'
-#main_directory = 'Test_RF'
-#main_directory = 'Test_DR_CSC_Final_1'
-init_folder = './data/initial_samples_old'
+
 
 objectives = [3]
 #objectives = [3,5,7]
@@ -110,18 +117,18 @@ interactive = True
 #############################################
 
 
-nruns = 1
+nruns = 9
 parallel_jobs = 1
 log_time = str(datetime.datetime.now())
 
 
 def parallel_execute(run, algo, prob, n_vars, obj, samp, sample_size):
     
-    path_to_file = './data/test_runs/'+ main_directory \
+    path_to_file = data_folder + '/test_runs/'+  main_directory \
                 + '/Offline_Mode_' + approaches_string + '_' + algo + \
                 '/' + samp + '/' + str(sample_size) + '/' + problem_testbench  + '/' + prob + '_' + str(obj) + '_' + str(n_vars)
     print(path_to_file)
-    with open('./data/test_runs/'+main_directory+"/log_"+log_time+".txt", "a") as text_file:
+    with open(data_folder + '/test_runs/'+ main_directory+"/log_"+log_time+".txt", "a") as text_file:
         text_file.write("\n"+path_to_file+"___"+str(run)+"___Started___"+str(datetime.datetime.now()))
     if not os.path.exists(path_to_file):
         os.makedirs(path_to_file)

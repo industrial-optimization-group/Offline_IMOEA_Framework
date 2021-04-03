@@ -21,7 +21,7 @@ def evaluate_population(init_folder,
     path_to_file = path_to_file + '/Run_' + str(run)
     data = pickle.load(open(path_to_file, "rb"))
     data_evaluted = {}
-    for i in range(1):
+    for i in range(len(data)):
         data_evaluted[i] = {}
         for approach in approaches:
             pop_obj_temp = data[i][approach]
@@ -29,7 +29,7 @@ def evaluate_population(init_folder,
             size_pop = np.shape(population)[0]
             population = matlab.double(population.tolist())
             objs_evaluated = eng.evaluate_python(population, init_folder, sampling, problem_name, nobjs, nvars, nsamples, 0, 0)
-            print(objs_evaluated)
+            #print(objs_evaluated)
             np_a = np.array(objs_evaluated._data.tolist())
             np_a = np_a.reshape((nobjs,size_pop))
             np_a = np.transpose(np_a)

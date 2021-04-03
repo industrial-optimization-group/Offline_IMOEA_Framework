@@ -1,6 +1,5 @@
 import sys
-#sys.path.insert(1, '/scratch/project_2003769/HTGP_MOEA_CSC')
-sys.path.insert(1, '/home/amrzr/Work/Codes/AmzNew/')
+sys.path.insert(1, '/home/amrzr/Work/Codes/Offline_IMOEA_Framework/')
 
 
 import adm_emo.baseADM
@@ -150,22 +149,12 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
 
 
     # the following two lines for getting pareto front by using pymoo framework
-    #problemR = get_problem(problem_name.lower(), nvars, nobjs)
     ref_dirs = get_reference_directions("das-dennis", nobjs, n_partitions=12)
-    #pareto_front = problemR.pareto_front(ref_dirs)
-
     # creates uniformly distributed reference vectors
     reference_vectors = ReferenceVectors(lattice_resolution, nobjs)
 
     # learning phase
     for i in range(L):
-        #data_row[["problem", "num_obj", "iteration", "num_gens"]] = [
-        #    problem_name,
-        #    n_obj,
-        #    i + 1,
-        #    gen,
-        #]
-
         # After this class call, solutions inside the composite front are assigned to reference vectors
         base = baseADM(cf, reference_vectors)
         problem.ideal = np.asarray(base.ideal_point)
@@ -192,54 +181,17 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
 
 
         # extend composite front with newly obtained solutions
-        cf = generate_composite_front(
+        cf = generate_composite_front(cf,
             dict_moea_objs[approaches[0]].population.objectives, 
             dict_moea_objs[approaches[1]].population.objectives, 
             do_nds=False
         )
-
-        # R-metric calculation
-        #ref_point = response.reshape(1, nobjs)
-
-        # normalize reference point
-        #rp_transformer = Normalizer().fit(ref_point)
-        #norm_rp = rp_transformer.transform(ref_point)
-
-        #rmetric = rm.RMetric(problemR, norm_rp, pf=pareto_front)
-
-        # normalize solutions before sending r-metric
-        #rvea_transformer = Normalizer().fit(int_rvea.population.objectives)
-        #norm_rvea = rvea_transformer.transform(int_rvea.population.objectives)
-
-        #probrvea_transformer = Normalizer().fit(int_probrvea.population.objectives)
-        #norm_probrvea = probrvea_transformer.transform(int_probrvea.population.objectives)
-
-        # R-metric calls for R_IGD and R_HV
-        #rigd_irvea, rhv_irvea = rmetric.calc(norm_rvea, others=norm_probrvea)
-        #rigd_iprobrvea, rhv_iprobrvea = rmetric.calc(norm_probrvea, others=norm_rvea)
-
-        #data_row[["iRVEA" + excess_col for excess_col in excess_columns]] = [
-        #    rigd_irvea,
-        #    rhv_irvea,
-        #]
-        #data_row[["iProbRVEA" + excess_col for excess_col in excess_columns]] = [
-        #    rigd_iprobrvea,
-        #    rhv_iprobrvea,
-        #]
-
-        #data = data.append(data_row, ignore_index=1)
 
     # Decision phase
     # After the learning phase the reference vector which has the maximum number of assigned solutions forms ROI
     max_assigned_vector = gp.get_max_assigned_vector(base.assigned_vectors)
 
     for i in range(D):
-        #data_row[["problem", "num_obj", "iteration", "num_gens"]] = [
-        #    problem_name,
-        #    n_obj,
-        #    L + i + 1,
-        #    gen,
-        #]
 
         # since composite front grows after each iteration this call should be done for each iteration
         base = baseADM(cf, reference_vectors)
@@ -251,9 +203,6 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
         print("Problem Ideal:",problem.ideal)
         # generates the next reference point for the decision phase
         response = gp.generateRP4decision(base, max_assigned_vector[0])
-        #data_row["reference_point"] = [
-        #    response,
-        #]
         print("Reference point:", response)
         dict_archive_all[i+L+1] = {}
         dict_archive_all[i+L+1]['reference_point'] = response
@@ -268,44 +217,11 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
             dict_archive_all[i+L+1][approach] = dict_moea_objs[approach].population
 
         # extend composite front with newly obtained solutions
-        cf = generate_composite_front(
+        cf = generate_composite_front(cf,
             dict_moea_objs[approaches[0]].population.objectives, 
             dict_moea_objs[approaches[1]].population.objectives, 
             do_nds=False
         )
 
-        # R-metric calculation
-        #ref_point = response.reshape(1, n_obj)
-
-        #rp_transformer = Normalizer().fit(ref_point)
-        #norm_rp = rp_transformer.transform(ref_point)
-
-        # for decision phase, delta is specified as 0.2
-        #rmetric = rm.RMetric(problemR, norm_rp, delta=0.2, pf=pareto_front)
-        
-
-        # normalize solutions before sending r-metric
-        #rvea_transformer = Normalizer().fit(int_rvea.population.objectives)
-        #norm_rvea = rvea_transformer.transform(int_rvea.population.objectives)
-
-        #probrvea_transformer = Normalizer().fit(int_probrvea.population.objectives)
-        #norm_probrvea = probrvea_transformer.transform(int_probrvea.population.objectives)
-
-        #rigd_irvea, rhv_irvea = rmetric.calc(norm_rvea, others=norm_probrvea)
-        #rigd_iprobrvea, rhv_iprobrvea = rmetric.calc(norm_probrvea, others=norm_rvea)
-        #print("R HV generic:", rhv_irvea)
-        #print("R HV prob:", rhv_iprobrvea)
-        #data_row[["iRVEA" + excess_col for excess_col in excess_columns]] = [
-        #    rigd_irvea,
-        #    rhv_irvea,
-        #]
-        #data_row[["iProbRVEA" + excess_col for excess_col in excess_columns]] = [
-        #    rigd_iprobrvea,
-        #    rhv_iprobrvea,
-        #]
-
-        #data = data.append(data_row, ignore_index=1)
-
-#data.to_csv("./adm_emo/results/output_test_am.csv", index=False)
     print(dict_archive_all)
     return dict_archive_all
