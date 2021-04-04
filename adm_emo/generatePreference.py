@@ -46,7 +46,7 @@ def generateRP4learning(base: baseADM):
 
 def get_max_assigned_vector(assigned_vectors):
 
-    print('Assigned vectors:',assigned_vectors)
+    #print('Assigned vectors:',assigned_vectors)
     number_assigned = np.bincount(assigned_vectors)
     #print('num ass:',number_assigned)
     max_assigned_vector = np.atleast_1d(
@@ -63,7 +63,7 @@ def get_max_assigned_vector(assigned_vectors):
 def generateRP4decision(base: baseADM, max_assigned_vector):
 
     assigned_vectors = base.assigned_vectors
-    print('Assigned vectors D:',assigned_vectors)
+    #print('Assigned vectors D:',assigned_vectors)
     ideal_cf = base.ideal_point
 
     translated_cf = base.translated_front
@@ -72,7 +72,7 @@ def generateRP4decision(base: baseADM, max_assigned_vector):
     sub_population_index = np.atleast_1d(
         np.squeeze(np.where(assigned_vectors == max_assigned_vector))
     )
-    print("Sub pop index D size:", np.shape(sub_population_index)[0])
+    #print("Sub pop index D size:", np.shape(sub_population_index)[0])
     sub_population_fitness = translated_cf[sub_population_index]
     # Distances of these solutions to the origin
     sub_pop_fitness_magnitude = np.sqrt(

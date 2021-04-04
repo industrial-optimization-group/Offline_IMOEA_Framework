@@ -38,7 +38,10 @@ from sklearn.preprocessing import Normalizer
 from pymoo.configuration import Configuration
 
 from pyDOE import lhs
+import copy
 
+data_folder = '/home/amrzr/Work/Codes/data'
+init_folder = data_folder + '/initial_samples_old'
 
 def compute_nadir(population):
     max_gen = None
@@ -76,11 +79,11 @@ def build_surrogates(problem_testbench, problem_name, nobjs, nvars, nsamples, sa
     return problem, time_taken
 
 def read_dataset(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, run):
-    mat = scipy.io.loadmat('./data/initial_samples_old/Initial_Population_' + problem_testbench + '_' + sampling +
+    mat = scipy.io.loadmat(init_folder+'/Initial_Population_' + problem_testbench + '_' + sampling +
                         '_AM_' + str(nvars) + '_'+str(nsamples)+'.mat')
     x = ((mat['Initial_Population_'+problem_testbench])[0][run])[0]
     if problem_testbench == 'DDMOPP':
-        mat = scipy.io.loadmat('./data/initial_samples_old/Obj_vals_DDMOPP_'+sampling+'_AM_'+problem_name+'_'
+        mat = scipy.io.loadmat(init_folder+'/Obj_vals_DDMOPP_'+sampling+'_AM_'+problem_name+'_'
                                 + str(nobjs) + '_' + str(nvars)
                                 + '_'+str(nsamples)+'.mat')
         y = ((mat['Obj_vals_DDMOPP'])[0][run])[0]
@@ -99,9 +102,10 @@ def read_dataset(problem_testbench, problem_name, nobjs, nvars, sampling, nsampl
 def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, is_data, approaches, run):
 
     # ADM parameters
-    L = 4  # number of iterations for the learning phase
-    D = 3  # number of iterations for the decision phase
-    lattice_resolution = 5  # density variable for creating reference vectors
+    L = 7  # number of iterations for the learning phase
+    D = 5  # number of iterations for the decision phase
+    lattice_res_options = [49, 13, 7, 5, 4, 3, 3, 3, 3]
+    lattice_resolution = lattice_res_options[nobjs-1]  # density variable for creating reference vectors
     num_gen_per_iter = 5
     num_approaches = len(approaches)
     dict_moea_objs = {}
@@ -120,9 +124,9 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
         elif approach == 'genericNSGAIII':
             dict_moea_objs[approach] = NSGAIII(problem=problem, interact=True, use_surrogates=True, n_gen_per_iter=num_gen_per_iter)
 
-
+    nadir_data = np.max(y_data,axis=0)
     # initial reference point is specified randomly
-    response = np.random.rand(nobjs)
+    response = np.random.rand(nobjs) + nadir_data
     print("Reference point:", response)
     dict_archive_all[0] = {}
     dict_archive_all[0]['reference_point'] = response
@@ -136,7 +140,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
         )
         _, pref_int_moea = dict_moea_objs[approach].iterate(pref_int_moea)
         #dict_moea_objs[approach] = int_moea_temp
-        dict_archive_all[0][approach] = dict_moea_objs[approach].population
+        dict_archive_all[0][approach] = copy.deepcopy(dict_moea_objs[approach].population)
 
 
     # change this line later
@@ -149,7 +153,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
 
 
     # the following two lines for getting pareto front by using pymoo framework
-    ref_dirs = get_reference_directions("das-dennis", nobjs, n_partitions=12)
+    #ref_dirs = get_reference_directions("das-dennis", nobjs, n_partitions=12)
     # creates uniformly distributed reference vectors
     reference_vectors = ReferenceVectors(lattice_resolution, nobjs)
 
@@ -161,6 +165,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
 
         for approach in approaches:
             dict_moea_objs[approach].population.ideal_objective_vector =  np.asarray(base.ideal_point)
+            dict_moea_objs[approach].population.ideal_fitness_val =  np.asarray(base.ideal_point)
             print("Ideal_"+approach+":", dict_moea_objs[approach].population.ideal_objective_vector)
 
         print("Problem Ideal:",problem.ideal)
@@ -177,8 +182,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
                 [response], columns=pref_int_moea.content["dimensions_data"].columns
             )
             _, pref_int_moea = dict_moea_objs[approach].iterate(pref_int_moea)
-            dict_archive_all[i+1][approach] = dict_moea_objs[approach].population
-
+            dict_archive_all[i+1][approach] = copy.deepcopy(dict_moea_objs[approach].population)
 
         # extend composite front with newly obtained solutions
         cf = generate_composite_front(cf,
@@ -188,6 +192,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
         )
 
     # Decision phase
+    base = baseADM(cf, reference_vectors)
     # After the learning phase the reference vector which has the maximum number of assigned solutions forms ROI
     max_assigned_vector = gp.get_max_assigned_vector(base.assigned_vectors)
 
@@ -199,6 +204,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
 
         for approach in approaches:
             dict_moea_objs[approach].population.ideal_objective_vector =  np.asarray(base.ideal_point)
+            dict_moea_objs[approach].population.ideal_fitness_val =  np.asarray(base.ideal_point)
             print("Ideal_"+approach+":", dict_moea_objs[approach].population.ideal_objective_vector)
         print("Problem Ideal:",problem.ideal)
         # generates the next reference point for the decision phase
@@ -214,7 +220,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
                 [response], columns=pref_int_moea.content["dimensions_data"].columns
             )
             _, pref_int_moea = dict_moea_objs[approach].iterate(pref_int_moea)
-            dict_archive_all[i+L+1][approach] = dict_moea_objs[approach].population
+            dict_archive_all[i+L+1][approach] = copy.deepcopy(dict_moea_objs[approach].population)
 
         # extend composite front with newly obtained solutions
         cf = generate_composite_front(cf,
