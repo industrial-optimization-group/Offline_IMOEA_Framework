@@ -204,12 +204,39 @@ for sample_size in sample_sizes:
                             temp = Parallel(n_jobs=11)(delayed(parallel_execute)(run, path_to_file, prob, obj) for run in range(nruns))
                             temp = np.asarray(temp)
                             #print(temp)
-                            mean_rmse = np.transpose(temp[:, 0])
-                            mean_eh = np.transpose(temp[:, 1])
-                            #print(mean_eh)
-                            #print(mean_rmse)
+                            mean_rmse_mv = temp[:, 0]
+                            mean_eh = temp[:, 1]
+                            print(mean_eh)
+                            print(mean_rmse_mv)
+
+                            ax = fig.add_subplot(121)
+                            bp = ax.boxplot(mean_rmse_mv, showfliers=False, widths=0.45)
+                            #ax.set_title(metric + '_'+ samp + '_Algo_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars))
+                            ax.set_title('MVRMSE comparison')
+                            ax.set_xlabel('Approaches')
+                            #ax.set_ylabel(metric)
+                            ax.set_ylabel('MVRMSE')
+                            ax.set_xticklabels(approaches, rotation=75, fontsize=10)
+
+                            ax = fig.add_subplot(122)
+                            bp = ax.boxplot(mean_eh, showfliers=False, widths=0.45)
+                            #ax.set_title(metric + '_'+ samp + '_Algo_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars))
+                            ax.set_title('EH comparison')
+                            ax.set_xlabel('Approaches')
+                            #ax.set_ylabel(metric)
+                            ax.set_ylabel('EH')
+                            ax.set_xticklabels(approaches, rotation=75, fontsize=10)
 
 
+
+                            filename_fig = data_folder + '/test_runs/' + main_directory + '/' + 'MVRMSE_EH' + '_' + str(sample_size) + '_' + samp + '_' + algo + '_' + prob + '_' + str(
+                                    obj) + '_' + str(n_vars)
+                            
+                            if save_fig == 'png':
+                                fig.savefig(filename_fig + '.png', bbox_inches='tight')
+                            else:
+                                fig.savefig(filename_fig + '.pdf', bbox_inches='tight')
+                            ax.clear()
 
                             """
                             if plot_boxplot is True:

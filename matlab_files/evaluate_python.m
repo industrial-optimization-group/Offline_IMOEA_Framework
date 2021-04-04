@@ -1,4 +1,4 @@
-function obj_vals = evaluate_python(population, init_folder, Strategy, Problem, M, nvars, sample_size, is_plot, plot_init) 
+function obj_vals = evaluate_python(population, init_folder, Strategy, Problem, M, nvars, sample_size, is_plot, plot_init)
     load(fullfile(init_folder,['DDMOPP_Params_' Strategy '_' Problem '_' num2str(M) '_' num2str(nvars) '_' num2str(sample_size) '.mat']));
     load(fullfile(init_folder,['Initial_Population_DDMOPP_' Strategy '_AM_' num2str(nvars) '_' num2str(sample_size) '.mat']));
     obj_vals = zeros(size(population,1),M);
