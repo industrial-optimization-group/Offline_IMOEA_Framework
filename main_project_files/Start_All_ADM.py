@@ -40,8 +40,8 @@ sample_sizes = [109]
 #folder_data = 'AM_Samples_109_Final'
 #folder_data = 'AM_Samples_1000'
 
-#problem_testbench = 'DTLZ'
-problem_testbench = 'DDMOPP'
+problem_testbench = 'DTLZ'
+#problem_testbench = 'DDMOPP'
 #problem_testbench = 'GAA'
 """
 objs(1) = max_NOISE;
@@ -58,7 +58,7 @@ objs(10) = PFPF;
 
 
 
-objectives = [3]
+objectives = [5]
 #objectives = [3,5,7]
 #objectives = [3, 5, 7]
 #objectives = [3,5,7]
@@ -67,10 +67,10 @@ objectives = [3]
 #objectives = [3,5,6,8,10]
 #objectives = [3,5,6,8,10]
 
-#problems = ['DTLZ2']
+problems = ['DTLZ5']
 #problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 
-problems = ['P1']
+#problems = ['P2']
 #problems = ['P1','P2','P3','P4']
 #problems = ['P1','P3','P4']
 
@@ -117,7 +117,7 @@ interactive = True
 #############################################
 
 
-nruns = 1
+nruns = 11
 parallel_jobs = 1
 log_time = str(datetime.datetime.now())
 

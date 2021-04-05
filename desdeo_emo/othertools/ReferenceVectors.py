@@ -11,6 +11,8 @@ import plotly
 from desdeo_emo.othertools.ProbabilityWrong import Probability_wrong
 import desdeo_emo.othertools.plot_reference_vectors as plt_refv
 
+data_folder = '/home/amrzr/Work/Codes/data'
+
 def normalize(vectors):
     """
     Normalize a set of vectors.
@@ -437,12 +439,16 @@ class ReferenceVectors:
             (Default value = 0.2)
 
         """
-
-        # find r_k = alpha / cos theta_k
-        
-        #r_k = bias + (1 - cos_theta_f_k) * weight
-        r_k = np.array([0.1, 0.5, 0.5])
+        testing = True      
+        if testing is True:
+            r_k = np.array([0.1, 0.5, 0.3])
+            ref_point = np.array([0.5,0.5,0.5])
+            r_k = r_k / np.linalg.norm(r_k)
+        else:
+            # find r_k = alpha / cos theta_k
+            r_k = bias + (1 - cos_theta_f_k) * weight
         print("r_k=",r_k)
+        print("ref pnt=",ref_point)
         #alpha_k = 0.2
         vector_norm = np.linalg.norm(self.initial_values, axis=1)
         #print("Alpha_k=",alpha_k)
@@ -453,13 +459,19 @@ class ReferenceVectors:
         self.values_planar = self.initial_values_planar * r_k + (
             (1 - r_k) * ref_point
         )
+        
+        path = data_folder + '/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10'
+
+        df = pd.DataFrame(data=np.vstack((self.values,[[0,0,1],[1,0,0],[0,1,0],[0,0,0]])))
+        fig = px.scatter_3d(df,x=0, y=1, z=2, range_x=[0,1], range_y=[0,1], range_z=[0,1])
+        plotly.offline.plot(fig,filename=path+"reference_vectors_plot.html")
 
         plt_refv.plot_refv(objs=self.values, 
             preference=ref_point, 
             iteration=33, 
             ideal=np.zeros(3), 
             nadir=np.ones(3),
-            path='./data/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10',
+            path= data_folder + '/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10',
             filen = 'refv_before_norm')
                                 
         #fig = plt.figure()
@@ -471,7 +483,7 @@ class ReferenceVectors:
             iteration=33, 
             ideal=np.zeros(3), 
             nadir=np.ones(3),
-            path='./data/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10',
+            path=data_folder + '/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10',
             filen = 'refv_planar_before_norm')
 
         norm_planar = np.linalg.norm(self.values_planar, axis=1)
@@ -485,7 +497,7 @@ class ReferenceVectors:
                     iteration=33, 
                     ideal=np.zeros(3), 
                     nadir=np.ones(3),
-                    path='./data/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10',
+                    path=data_folder + '/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10',
                     filen = 'refv_planar_normalized')
 
 
@@ -496,7 +508,7 @@ class ReferenceVectors:
                     iteration=33, 
                     ideal=np.zeros(3), 
                     nadir=np.ones(3),
-                    path='./data/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10',
+                    path=data_folder + '/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10',
                     filen = 'refv_normalized')
 
 

@@ -21,6 +21,8 @@ sample_size = 109
 ############################################
 folder_data = 'AM_Samples_109_Final'
 #folder_data = 'AM_Samples_1000'
+data_folder = '/home/amrzr/Work/Codes/data'
+init_folder = data_folder + '/initial_samples_old'
 
 problem_testbench = 'DTLZ'
 #problem_testbench = 'DDMOPP'
@@ -83,11 +85,11 @@ for samp in sampling:
             for prob in problems:
                 for algo in emo_algorithm:
                     for approach in approaches:
-                        path_to_file = './data/test_runs/' + main_directory \
+                        path_to_file = data_folder + '/test_runs/' + main_directory \
                                        + '/Offline_Mode_' + approach + '_' + algo + \
                                        '/' + samp + '/' + str(sample_size) + '/' + problem_testbench  + '/' + prob + '_' + str(obj) + '_' + str(n_vars)
                         print(path_to_file)
-                        with open('./data/test_runs/'+main_directory+"/log_"+log_time+".txt", "a") as text_file:
+                        with open(data_folder+'/test_runs/'+main_directory+"/log_"+log_time+".txt", "a") as text_file:
                             text_file.write("\n"+path_to_file+"_____"+str(datetime.datetime.now()))
                         if not os.path.exists(path_to_file):
                             os.makedirs(path_to_file)

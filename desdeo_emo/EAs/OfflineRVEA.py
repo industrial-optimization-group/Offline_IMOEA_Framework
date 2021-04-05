@@ -237,11 +237,11 @@ class RVEA(BaseDecompositionEA):
             refpoint = refpoint / norm
             
             # evaluate alpha_k
-            #cos_theta_f_k = self.reference_vectors.find_cos_theta_f_k(refpoint_actual, self.population, self.objs_interation_end, self.unc_interaction_end)
+            cos_theta_f_k = self.reference_vectors.find_cos_theta_f_k(refpoint_actual, self.population, self.objs_interation_end, self.unc_interaction_end)
             # adapt reference vectors
-            #self.reference_vectors.interactive_adapt_offline_adaptive(refpoint, cos_theta_f_k)
+            self.reference_vectors.interactive_adapt_offline_adaptive(refpoint, cos_theta_f_k)
             
-            self.reference_vectors.iteractive_adapt_1(refpoint)
+            #self.reference_vectors.iteractive_adapt_1(refpoint)
             
             self.reference_vectors.add_edge_vectors()   
             

@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(1, '/mnt/i/AmzNew/')
+sys.path.insert(1, '/home/amrzr/Work/Codes/Offline_IMOEA_Framework/')
 
 from desdeo_problem.Problem import DataProblem
 
@@ -29,13 +29,13 @@ from BIOMA_framework import interactive_optimize
 max_samples = 50
 max_iters = 5
 gen_per_iter=100
-
+data_folder = '/home/amrzr/Work/Codes/data'
 def read_dataset(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, run):
-    mat = scipy.io.loadmat('./data/initial_samples_old/Initial_Population_' + problem_testbench + '_' + sampling +
+    mat = scipy.io.loadmat(data_folder+'/initial_samples_old/Initial_Population_' + problem_testbench + '_' + sampling +
                         '_AM_' + str(nvars) + '_'+str(nsamples)+'.mat')
     x = ((mat['Initial_Population_'+problem_testbench])[0][run])[0]
     if problem_testbench == 'DDMOPP':
-        mat = scipy.io.loadmat('./data/initial_samples_old/Obj_vals_DDMOPP_'+sampling+'_AM_'+problem_name+'_'
+        mat = scipy.io.loadmat(data_folder+'/initial_samples_old/Obj_vals_DDMOPP_'+sampling+'_AM_'+problem_name+'_'
                                 + str(nobjs) + '_' + str(nvars)
                                 + '_'+str(nsamples)+'.mat')
         y = ((mat['Obj_vals_DDMOPP'])[0][run])[0]

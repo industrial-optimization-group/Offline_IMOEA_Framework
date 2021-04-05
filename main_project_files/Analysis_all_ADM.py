@@ -59,19 +59,19 @@ dims = [10]
 #sample_sizes = [2000, 10000]#, 50000]
 sample_sizes = [109]
 
-#problem_testbench = 'DTLZ'
-problem_testbench = 'DDMOPP'
+problem_testbench = 'DTLZ'
+#problem_testbench = 'DDMOPP'
 
 
 
 #objectives = [3,5,7]
-objectives = [3]
+objectives = [5]
 #objectives = [2,3,5]
 #objectives = [3,5,6,8,10]
 
-#problems = ['DTLZ2']
+problems = ['DTLZ5']
 #problems = ['DTLZ2','DTLZ4']
-problems = ['P1']
+#problems = ['P1']
 #problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 #problems = ['P1','P2','P3','P4']
 #problems = ['P4']
@@ -99,8 +99,8 @@ hv_ref = {"DTLZ2": {"2": [3, 3], "3": [6, 6, 6], "5": [6, 6, 6, 6, 6],  "7": [6,
           "DTLZ7": {"2": [1, 20], "3": [1, 1, 40], "5": [1, 1, 1, 1, 50] ,  "7": [1, 1, 1, 1, 1, 1, 70]}}
 
 
-nruns = 9
-pool_size = nruns
+nruns = 11
+pool_size = 1
 
 plot_boxplot = True
 
@@ -201,7 +201,7 @@ for sample_size in sample_sizes:
                                 return [mean_rmse_mv_iters,mean_eh_iters]
 
 
-                            temp = Parallel(n_jobs=11)(delayed(parallel_execute)(run, path_to_file, prob, obj) for run in range(nruns))
+                            temp = Parallel(n_jobs=pool_size)(delayed(parallel_execute)(run, path_to_file, prob, obj) for run in range(nruns))
                             temp = np.asarray(temp)
                             #print(temp)
                             mean_rmse_mv = temp[:, 0]
