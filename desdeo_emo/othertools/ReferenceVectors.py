@@ -441,9 +441,11 @@ class ReferenceVectors:
         """
         testing = True      
         if testing is True:
-            r_k = np.array([0.1, 0.5, 0.3])
+            #r_k = np.array([0.1, 0.1, 0.1])
+            #r_k = np.array([0.1, 0.5, 0.3])
+            r_k = np.array([0.1, 0.5, 0.1])
             ref_point = np.array([0.5,0.5,0.5])
-            r_k = r_k / np.linalg.norm(r_k)
+            #r_k = r_k / np.linalg.norm(r_k)
         else:
             # find r_k = alpha / cos theta_k
             r_k = bias + (1 - cos_theta_f_k) * weight
@@ -464,7 +466,17 @@ class ReferenceVectors:
 
         df = pd.DataFrame(data=np.vstack((self.values,[[0,0,1],[1,0,0],[0,1,0],[0,0,0]])))
         fig = px.scatter_3d(df,x=0, y=1, z=2, range_x=[0,1], range_y=[0,1], range_z=[0,1])
-        plotly.offline.plot(fig,filename=path+"reference_vectors_plot.html")
+        plotly.offline.plot(fig,filename=path+"reference_vectors_plot_before_norm.html")
+
+        self.normalize()
+
+        df = pd.DataFrame(data=np.vstack((self.values,[[0,0,1],[1,0,0],[0,1,0],[0,0,0]])))
+        fig = px.scatter_3d(df,x=0, y=1, z=2, range_x=[0,1], range_y=[0,1], range_z=[0,1])
+        plotly.offline.plot(fig,filename=path+"reference_vectors_plot_after_norm.html")
+
+        print("Plotting done!")
+
+        """
 
         plt_refv.plot_refv(objs=self.values, 
             preference=ref_point, 
@@ -510,6 +522,7 @@ class ReferenceVectors:
                     nadir=np.ones(3),
                     path=data_folder + '/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10',
                     filen = 'refv_normalized')
+        """
 
 
 
