@@ -111,7 +111,7 @@ class RVEA(BaseDecompositionEA):
         n_gen_per_iter: int = 100,
         total_function_evaluations: int = 0,
         time_penalty_component: Union[str, float] = None,
-        thresh_size = 5
+        
     ):
         super().__init__(
             problem=problem,
@@ -127,13 +127,15 @@ class RVEA(BaseDecompositionEA):
             total_function_evaluations=total_function_evaluations,
         )
         self.time_penalty_component = time_penalty_component
-        self.thresh_size = thresh_size
+        #self.thresh_size = thresh_size
         self.objs_interation_end = None
         self.unc_interaction_end = None
         self.iteration_archive_individuals = None
         self.iteration_archive_objectives = None
         self.iteration_archive_fitness = None
         self.iteration_archive_uncertainty = None
+        self.thresh_size = 5 * problem.n_of_objectives
+
         time_penalty_component_options = ["original", "function_count", "interactive"]
         if time_penalty_component is None:
             if interact is True:
@@ -241,7 +243,8 @@ class RVEA(BaseDecompositionEA):
             # adapt reference vectors
             #self.reference_vectors.interactive_adapt_offline_adaptive(refpoint, cos_theta_f_k)
             
-            self.reference_vectors.iteractive_adapt_1(refpoint)            
+            self.reference_vectors.iteractive_adapt_1(refpoint)
+            
             self.reference_vectors.add_edge_vectors()   
             
         self.reference_vectors.neighbouring_angles()
@@ -255,6 +258,27 @@ class RVEA(BaseDecompositionEA):
             self.iteration_archive_objectives = np.vstack((self.iteration_archive_objectives, self.population.objectives))
             self.iteration_archive_fitness = np.vstack((self.iteration_archive_fitness, self.population.fitness))
             self.iteration_archive_uncertainty = np.vstack((self.iteration_archive_uncertainty, self.population.uncertainity))
+    
+    
+    def _next_gen(self):
+        size_pop = np.shape(self.population.objectives)[0]
+        #print("Pop size before recombination: ",size_pop)
+        if self.interact is True and size_pop <= self.thresh_size:
+            self.population.individuals = self.iteration_archive_individuals
+            self.population.objectives = self.iteration_archive_objectives
+            self.population.fitness = self.iteration_archive_fitness
+            self.population.uncertainity = self.iteration_archive_uncertainty
+            print("population injected in genration :",self._gen_count_in_curr_iteration)
+        else:
+            offspring = self.population.mate()  # (params=self.params)
+            self.population.add(offspring, self.use_surrogates)
+            self._function_evaluation_count += offspring.shape[0]
+        #print("Pop size after recombination: ",np.shape(self.population.objectives)[0])
+        selected = self._select()
+        #print("selected size:",np.shape(selected)[0])
+        self.population.keep(selected)
+        self._current_gen_count += 1
+        self._gen_count_in_curr_iteration += 1
 """
     def _next_gen(self):
         size_pop = np.shape(self.population.objectives)[0]
@@ -276,78 +300,7 @@ class RVEA(BaseDecompositionEA):
         self._current_gen_count += 1
         self._gen_count_in_curr_iteration += 1
 """        
-"""
-class ProbRVEAv1(RVEA):
-    def __init__(
-        self,
-        problem: MOProblem,
-        population_size: int = None,
-        population_params: Dict = None,
-        initial_population: Population = None,
-        alpha: float = 2,
-        lattice_resolution: int = None,
-        a_priori: bool = False,
-        interact: bool = False,
-        use_surrogates: bool = False,
-        n_iterations: int = 10,
-        n_gen_per_iter: int = 100,
-        total_function_evaluations: int = 0,
-        time_penalty_component: Union[str, float] = None,
-    ):
-        super().__init__(
-            problem=problem,
-            population_size=population_size,
-            population_params=population_params,
-            initial_population=initial_population,
-            lattice_resolution=lattice_resolution,
-            a_priori=a_priori,
-            interact=interact,
-            use_surrogates=use_surrogates,
-            n_iterations=n_iterations,
-            n_gen_per_iter=n_gen_per_iter,
-            total_function_evaluations=total_function_evaluations,
-        )
-        selection_operator = Prob_APD_Select_v1(
-            self.population, self.time_penalty_function, alpha
-        )
-        self.selection_operator = selection_operator
 
-
-class ProbRVEAv2(RVEA):
-    def __init__(
-        self,
-        problem: MOProblem,
-        population_size: int = None,
-        population_params: Dict = None,
-        initial_population: Population = None,
-        alpha: float = 2,
-        lattice_resolution: int = None,
-        a_priori: bool = False,
-        interact: bool = False,
-        use_surrogates: bool = False,
-        n_iterations: int = 10,
-        n_gen_per_iter: int = 100,
-        total_function_evaluations: int = 0,
-        time_penalty_component: Union[str, float] = None,
-    ):
-        super().__init__(
-            problem=problem,
-            population_size=population_size,
-            population_params=population_params,
-            initial_population=initial_population,
-            lattice_resolution=lattice_resolution,
-            a_priori=a_priori,
-            interact=interact,
-            use_surrogates=use_surrogates,
-            n_iterations=n_iterations,
-            n_gen_per_iter=n_gen_per_iter,
-            total_function_evaluations=total_function_evaluations,
-        )
-        selection_operator = Prob_APD_Select_v2(
-            self.population, self.time_penalty_function, alpha
-        )
-        self.selection_operator = selection_operator
-"""
 
 class ProbRVEAv3(RVEA):
     def __init__(
@@ -384,27 +337,63 @@ class ProbRVEAv3(RVEA):
         )
         self.selection_operator = selection_operator
 
-    """
-    def _next_gen(self):
-        size_pop = np.shape(self.population.objectives)[0]
-        #print("Pop size before recombination: ",size_pop)
-        if self.interact is True and size_pop <= self.thresh_size:
-            self.population.individuals = self.iteration_archive_individuals
-            self.population.objectives = self.iteration_archive_objectives
-            self.population.fitness = self.iteration_archive_fitness
-            self.population.uncertainity = self.iteration_archive_uncertainty
-            print("population injected!!!!")
+    def manage_preferences(self, preference=None):
+        """Run the interruption phase of EA.
+
+        Use this phase to make changes to RVEA.params or other objects.
+        Updates Reference Vectors (adaptation), conducts interaction with the user.
+
+        """
+        if not isinstance(preference, (ReferencePointPreference, type(None))):
+            msg = (
+                f"Wrong object sent as preference. Expected type = "
+                f"{type(ReferencePointPreference)} or None\n"
+                f"Recieved type = {type(preference)}"
+            )
+            raise eaError(msg)
+        if preference is not None:
+            if preference.request_id != self._interaction_request_id:
+                msg = (
+                    f"Wrong preference object sent. Expected id = "
+                    f"{self._interaction_request_id}.\n"
+                    f"Recieved id = {preference.request_id}"
+                )
+                raise eaError(msg)
+        if preference is None and not self._ref_vectors_are_focused:
+            self.reference_vectors.adapt(self.population.fitness)
+        if preference is not None:
+            ideal = self.population.ideal_fitness_val
+            #fitness_vals = self.population.ob
+            refpoint_actual = (
+                preference.response.values * self.population.problem._max_multiplier
+            )
+            refpoint = refpoint_actual - ideal
+            norm = np.sqrt(np.sum(np.square(refpoint)))
+            refpoint = refpoint / norm
+            
+            # evaluate alpha_k
+            cos_theta_f_k = self.reference_vectors.find_cos_theta_f_k(refpoint_actual, self.population, self.objs_interation_end, self.unc_interaction_end)
+            # adapt reference vectors
+            self.reference_vectors.interactive_adapt_offline_adaptive(refpoint, cos_theta_f_k)
+            
+            #self.reference_vectors.iteractive_adapt_1(refpoint)
+            
+            self.reference_vectors.add_edge_vectors()
+            #print("Shape RV:", np.shape(self.reference_vectors.values))
+        
+        self.reference_vectors.neighbouring_angles()
+        if self.iteration_archive_objectives is None: 
+            self.iteration_archive_individuals = self.population.individuals
+            self.iteration_archive_objectives = self.population.objectives
+            self.iteration_archive_fitness = self.population.fitness
+            self.iteration_archive_uncertainty = self.population.uncertainity
         else:
-            offspring = self.population.mate()  # (params=self.params)
-            self.population.add(offspring, self.use_surrogates)
-            self._function_evaluation_count += offspring.shape[0]
-        #print("Pop size after recombination: ",np.shape(self.population.objectives)[0])
-        selected = self._select()
-        #print("selected size:",np.shape(selected)[0])
-        self.population.keep(selected)
-        self._current_gen_count += 1
-        self._gen_count_in_curr_iteration += 1
-    """
+            self.iteration_archive_individuals = np.vstack((self.iteration_archive_individuals, self.population.individuals))
+            self.iteration_archive_objectives = np.vstack((self.iteration_archive_objectives, self.population.objectives))
+            self.iteration_archive_fitness = np.vstack((self.iteration_archive_fitness, self.population.fitness))
+            self.iteration_archive_uncertainty = np.vstack((self.iteration_archive_uncertainty, self.population.uncertainity))
+
+
 class HybridRVEA(RVEA):
     def __init__(
         self,

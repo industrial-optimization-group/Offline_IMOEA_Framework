@@ -439,7 +439,8 @@ class ReferenceVectors:
             (Default value = 0.2)
 
         """
-        testing = True      
+        #testing = True      
+        testing = False 
         if testing is True:
             #r_k = np.array([0.1, 0.1, 0.1])
             #r_k = np.array([0.1, 0.5, 0.3])
@@ -450,7 +451,7 @@ class ReferenceVectors:
             # find r_k = alpha / cos theta_k
             r_k = bias + (1 - cos_theta_f_k) * weight
         print("r_k=",r_k)
-        print("ref pnt=",ref_point)
+        #print("ref pnt=",ref_point)
         #alpha_k = 0.2
         vector_norm = np.linalg.norm(self.initial_values, axis=1)
         #print("Alpha_k=",alpha_k)
@@ -461,7 +462,9 @@ class ReferenceVectors:
         self.values_planar = self.initial_values_planar * r_k + (
             (1 - r_k) * ref_point
         )
-        
+        self.normalize()
+
+        """
         path = data_folder + '/test_runs/Test_interactive_1/Offline_Mode_interactive_uncertainty_RVEA/LHS/109/DDMOPP/P1_3_10'
 
         df = pd.DataFrame(data=np.vstack((self.values,[[0,0,1],[1,0,0],[0,1,0],[0,0,0]])))
@@ -476,7 +479,6 @@ class ReferenceVectors:
 
         print("Plotting done!")
 
-        """
 
         plt_refv.plot_refv(objs=self.values, 
             preference=ref_point, 

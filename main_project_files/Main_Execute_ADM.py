@@ -8,14 +8,17 @@ import adm_emo.generatePreference as gp
 
 
 from desdeo_emo.EAs.RVEA import RVEA
-#from desdeo_emo.EAs.OfflineRVEA import RVEA
-from desdeo_emo.EAs.OfflineRVEA import ProbRVEAv3
+from desdeo_emo.EAs.OfflineRVEA import RVEA as RVEA_0
+from desdeo_emo.EAs.OfflineRVEA import ProbRVEAv3 as ProbRVEA_0
+from desdeo_emo.EAs.OfflineRVEAnew import RVEA as RVEA_1
+from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv3 as ProbRVEA_1
 from desdeo_emo.EAs.NSGAIII import NSGAIII
 
 
 from desdeo_problem.Problem import DataProblem
 from desdeo_problem.surrogatemodels.SurrogateModels import GaussianProcessRegressor
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
+from main_project_files.surrogate_fullGP import FullGPRegressor as fgp
 
 from sklearn.gaussian_process.kernels import Matern
 from pyDOE import lhs
@@ -73,7 +76,8 @@ def build_surrogates(problem_testbench, problem_name, nobjs, nvars, nsamples, sa
     bounds = pd.DataFrame(np.vstack((x_low,x_high)), columns=x_names, index=row_names)
     problem = DataProblem(data=data, variable_names=x_names, objective_names=y_names,bounds=bounds)
     start = time.time()
-    problem.train(GaussianProcessRegressor) #, model_parameters={"kernel": Matern(nu=3/2)})
+    #problem.train(GaussianProcessRegressor) #, model_parameters={"kernel": Matern(nu=3/2)})
+    problem.train(fgp)
     end = time.time()
     time_taken = end - start
     return problem, time_taken
@@ -102,25 +106,30 @@ def read_dataset(problem_testbench, problem_name, nobjs, nvars, sampling, nsampl
 def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, is_data, approaches, run):
 
     # ADM parameters
-    L = 10  # number of iterations for the learning phase
-    D = 10  # number of iterations for the decision phase
+    L = 5  # number of iterations for the learning phase
+    D = 5  # number of iterations for the decision phase
     lattice_res_options = [49, 13, 7, 5, 4, 3, 3, 3, 3]
     lattice_resolution = lattice_res_options[nobjs-1]  # density variable for creating reference vectors
-    num_gen_per_iter = 100
+    num_gen_per_iter = 50
     num_approaches = len(approaches)
     dict_moea_objs = {}
     dict_pref_int_moea = {}
     dict_archive_all = {}
-
+    print("Reading data ...")
     x_data, y_data = read_dataset(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, run)
+    print("Building surrogates ...")
     problem, time_taken = build_surrogates(problem_testbench, problem_name, nobjs, nvars, nsamples, sampling, is_data, x_data, y_data)
 
     # define MOEA objects
     for approach in approaches:
-        if approach == 'genericRVEA':
-            dict_moea_objs[approach] = RVEA(problem=problem, interact=True, use_surrogates=True, n_gen_per_iter=num_gen_per_iter)
-        elif approach == 'probRVEA':
-            dict_moea_objs[approach] = ProbRVEAv3(problem=problem, interact=True, use_surrogates=True, n_gen_per_iter=num_gen_per_iter)
+        if approach == 'genericRVEA_0':
+            dict_moea_objs[approach] = RVEA_0(problem=problem, interact=True, use_surrogates=True, n_gen_per_iter=num_gen_per_iter)
+        elif approach == 'probRVEA_0':
+            dict_moea_objs[approach] = ProbRVEA_0(problem=problem, interact=True, use_surrogates=True, n_gen_per_iter=num_gen_per_iter)
+        elif approach == 'genericRVEA_1':
+            dict_moea_objs[approach] = RVEA_1(problem=problem, interact=True, use_surrogates=True, n_gen_per_iter=num_gen_per_iter)
+        elif approach == 'probRVEA_1':
+            dict_moea_objs[approach] = ProbRVEA_1(problem=problem, interact=True, use_surrogates=True, n_gen_per_iter=num_gen_per_iter)
         elif approach == 'genericNSGAIII':
             dict_moea_objs[approach] = NSGAIII(problem=problem, interact=True, use_surrogates=True, n_gen_per_iter=num_gen_per_iter)
 
@@ -132,22 +141,23 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
     dict_archive_all[0]['reference_point'] = response
     dict_archive_all[0]['phase'] = 'S'
     for approach in approaches:
-        #int_moea_temp = dict_moea_objs[approach]
+        print("Optimizing approach: ", approach)
         # run algorithms once with the randomly generated reference point
         _, pref_int_moea = dict_moea_objs[approach].requests()
         pref_int_moea.response = pd.DataFrame(
             [response], columns=pref_int_moea.content["dimensions_data"].columns
         )
         _, pref_int_moea = dict_moea_objs[approach].iterate(pref_int_moea)
-        #dict_moea_objs[approach] = int_moea_temp
         dict_archive_all[0][approach] = copy.deepcopy(dict_moea_objs[approach].population)
 
-
+    ##########################
     # change this line later
     # build initial composite front
     cf = generate_composite_front(
         dict_moea_objs[approaches[0]].population.objectives, 
-        dict_moea_objs[approaches[1]].population.objectives, 
+        dict_moea_objs[approaches[1]].population.objectives,
+        dict_moea_objs[approaches[2]].population.objectives, 
+        dict_moea_objs[approaches[3]].population.objectives, 
         do_nds=False
     )
 
@@ -166,7 +176,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
         for approach in approaches:
             dict_moea_objs[approach].population.ideal_objective_vector =  np.asarray(base.ideal_point)
             dict_moea_objs[approach].population.ideal_fitness_val =  np.asarray(base.ideal_point)
-            print("Ideal_"+approach+":", dict_moea_objs[approach].population.ideal_objective_vector)
+            #print("Ideal_"+approach+":", dict_moea_objs[approach].population.ideal_objective_vector)
 
         print("Problem Ideal:",problem.ideal)
         # generates the next reference point for the next iteration in the learning phase
@@ -176,6 +186,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
         dict_archive_all[i+1]['reference_point'] = response
         dict_archive_all[i+1]['phase'] = 'L'
         for approach in approaches:
+            print("Optimizing approach: ", approach)
             # run algorithms with the new reference point
             _, pref_int_moea = dict_moea_objs[approach].requests()
             pref_int_moea.response = pd.DataFrame(
@@ -185,9 +196,11 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
             dict_archive_all[i+1][approach] = copy.deepcopy(dict_moea_objs[approach].population)
 
         # extend composite front with newly obtained solutions
-        cf = generate_composite_front(cf,
+        cf = generate_composite_front(
             dict_moea_objs[approaches[0]].population.objectives, 
-            dict_moea_objs[approaches[1]].population.objectives, 
+            dict_moea_objs[approaches[1]].population.objectives,
+            dict_moea_objs[approaches[2]].population.objectives, 
+            dict_moea_objs[approaches[3]].population.objectives, 
             do_nds=False
         )
 
@@ -214,6 +227,7 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
         dict_archive_all[i+L+1]['reference_point'] = response
         dict_archive_all[i+L+1]['phase'] = 'D'
         for approach in approaches:
+            print("Optimizing approach: ", approach)
             # run algorithms with the new reference point
             _, pref_int_moea = dict_moea_objs[approach].requests()
             pref_int_moea.response = pd.DataFrame(
@@ -223,9 +237,11 @@ def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, i
             dict_archive_all[i+L+1][approach] = copy.deepcopy(dict_moea_objs[approach].population)
 
         # extend composite front with newly obtained solutions
-        cf = generate_composite_front(cf,
+        cf = generate_composite_front(
             dict_moea_objs[approaches[0]].population.objectives, 
-            dict_moea_objs[approaches[1]].population.objectives, 
+            dict_moea_objs[approaches[1]].population.objectives,
+            dict_moea_objs[approaches[2]].population.objectives, 
+            dict_moea_objs[approaches[3]].population.objectives, 
             do_nds=False
         )
 

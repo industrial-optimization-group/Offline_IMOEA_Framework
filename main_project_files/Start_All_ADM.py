@@ -25,8 +25,8 @@ init_folder = data_folder + '/initial_samples_old'
 
 
 #convert_to_mat = True
-evaluate_data = True
-#evaluate_data = False
+#evaluate_data = True
+evaluate_data = False
 #import Telegram_bot.telegram_bot_messenger as tgm
 #dims = [5,8,10] #,8]
 #dims = [2, 5, 7, 10]
@@ -67,7 +67,7 @@ objectives = [5]
 #objectives = [3,5,6,8,10]
 #objectives = [3,5,6,8,10]
 
-problems = ['DTLZ5']
+problems = ['DTLZ7']
 #problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 
 #problems = ['P2']
@@ -95,7 +95,8 @@ problems = ['DTLZ5']
 #approaches = ["generic_fullgp","htgp"]
 #approaches = ["generic_fullgp","generic_sparsegp","htgp"]
 #approaches = ["generic_sparsegp","htgp"]
-approaches = ["genericRVEA","probRVEA"]
+#approaches = ["genericRVEA","probRVEA"]
+approaches = ["genericRVEA_0","probRVEA_0","genericRVEA_1","probRVEA_1"]
 #approaches = ["probRVEA"]
 approaches_string = '_'.join(approaches)
 
@@ -117,7 +118,7 @@ interactive = True
 #############################################
 
 
-nruns = 11
+nruns = 1
 parallel_jobs = 1
 log_time = str(datetime.datetime.now())
 

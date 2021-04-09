@@ -50,6 +50,7 @@ class Prob_APD_select_v3(SelectionBase):
         fitness = pop.fitness
         uncertainty = pop.uncertainity
         penalty_factor = self._partial_penalty_factor()
+        #print("Penalty factor:",penalty_factor)
         refV = vectors.neighbouring_angles_current
         fmin = np.amin(fitness, axis=0)
         translated_fitness = fitness - fmin
