@@ -42,14 +42,15 @@ data_folder = '/home/amrzr/Work/Codes/data'
 #main_directory = 'Tests_toys'
 #main_directory = 'Test_Gpy3'
 #main_directory = 'Test_DR_4'  #DR = Datatset Reduction
-main_directory = 'Test_DR_Scratch'
+#main_directory = 'Test_DR_Scratch'
+main_directory = 'Test_Interactive_2'
 #main_directory = 'Test_DR_CSC_1'
 #main_directory = 'Test_RF'
 #main_directory = 'Test_DR_CSC_Final_1'
-init_folder = data_folder + '/initial_samples_old'
+init_folder = data_folder + '/initial_samples_109'
 
 mod_p_val = True
-perform_bonferonni = False
+perform_bonferonni = True
 metric = 'HV'
 #metric = 'IGD'
 save_fig = 'pdf'
@@ -59,35 +60,37 @@ dims = [10]
 #sample_sizes = [2000, 10000]#, 50000]
 sample_sizes = [109]
 
-problem_testbench = 'DTLZ'
-#problem_testbench = 'DDMOPP'
-
-
-
-#objectives = [3,5,7]
-objectives = [5]
+objectives = [5,7,9]
+#objectives = [5]
 #objectives = [2,3,5]
 #objectives = [3,5,6,8,10]
 
-problems = ['DTLZ5']
+problem_testbench = 'DTLZ'
+#problem_testbench = 'DDMOPP'
+
+#problems = ['DTLZ5']
 #problems = ['DTLZ2','DTLZ4']
 #problems = ['P1']
-#problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
-#problems = ['P1','P2','P3','P4']
+problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
+#problems = ['P1','P2','P3','P4','P5']
+#problems = ['P1','P2']
 #problems = ['P4']
 #problems = ['WELDED_BEAM'] #dims=4
 #problems = ['TRUSS2D'] #dims=3
 
 
-sampling = ['LHS']
+#sampling = ['LHS']
 #sampling = ['MVNORM']
-#sampling = ['LHS', 'MVNORM']
+sampling = ['LHS', 'MVNORM']
 
 emo_algorithm = ['RVEA']
 
 
-approaches = ["genericRVEA","probRVEA"]
+#approaches = ["genericRVEA","probRVEA"]
+approaches = ["genericRVEA_0","probRVEA_0","genericRVEA_1","probRVEA_1"]
+approaches_labels = ["genericRVEA0","probRVEA0","genericRVEA1","probRVEA1"]
 approaches_string = '_'.join(approaches)
+mode_length = int(np.size(approaches))
 
 approaches_length = int(np.size(approaches))
 
@@ -108,7 +111,7 @@ l = [approaches]*nruns
 labels = [list(i) for i in zip(*l)]
 labels = [y for x in labels for y in x]
 
-p_vals_all_hv = None
+p_vals_all_eh = None
 p_vals_all_rmse = None
 p_vals_all_time = None
 index_all = None
@@ -198,210 +201,124 @@ for sample_size in sample_sizes:
                                 #print("EH metric:",eh_iters)
                                 mean_eh_iters = np.divide(mean_eh_iters,len(run_data))
                                 mean_rmse_mv_iters = np.divide(mean_rmse_mv_iters,len(run_data))
-                                return [mean_rmse_mv_iters,mean_eh_iters]
+
+                                median_eh = np.zeros(approaches_length)
+                                median_rmse = np.zeros(approaches_length)
+                                for approach,count in zip(approaches,range(approaches_length)):
+                                    rmse_stack = np.zeros(len(run_data))
+                                    eh_stack = np.zeros(len(run_data))
+                                    for iter in range(len(run_data)):
+                                        eh_stack[iter] = eh_iters[iter][approach]
+                                        rmse_stack[iter] = rmse_mv_iters[iter][approach]
+                                    median_eh[count] = np.median(eh_stack)
+                                    median_rmse[count] = np.median(rmse_stack)    
+                                #return [mean_rmse_mv_iters,mean_eh_iters]
+                                return [median_rmse,median_eh]
+
+                            try:
+                                temp = Parallel(n_jobs=pool_size)(delayed(parallel_execute)(run, path_to_file, prob, obj) for run in range(nruns))
+                                temp = np.asarray(temp)
+                                #print(temp)
+                                mean_rmse_mv = temp[:, 0]
+                                mean_eh = temp[:, 1]
+                                print(mean_eh)
+                                print(mean_rmse_mv)
+
+                                ax = fig.add_subplot(121)
+                                bp = ax.boxplot(mean_rmse_mv, showfliers=False, widths=0.45)
+                                #ax.set_title(metric + '_'+ samp + '_Algo_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars))
+                                ax.set_title('MVRMSE comparison')
+                                ax.set_xlabel('Approaches')
+                                #ax.set_ylabel(metric)
+                                ax.set_ylabel('MVRMSE')
+                                ax.set_xticklabels(approaches_labels, rotation=75, fontsize=10)
+
+                                ax = fig.add_subplot(122)
+                                bp = ax.boxplot(mean_eh, showfliers=False, widths=0.45)
+                                #ax.set_title(metric + '_'+ samp + '_Algo_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars))
+                                ax.set_title('EH comparison')
+                                ax.set_xlabel('Approaches')
+                                #ax.set_ylabel(metric)
+                                ax.set_ylabel('EH')
+                                ax.set_xticklabels(approaches_labels, rotation=75, fontsize=10)
 
 
-                            temp = Parallel(n_jobs=pool_size)(delayed(parallel_execute)(run, path_to_file, prob, obj) for run in range(nruns))
-                            temp = np.asarray(temp)
-                            #print(temp)
-                            mean_rmse_mv = temp[:, 0]
-                            mean_eh = temp[:, 1]
-                            print(mean_eh)
-                            print(mean_rmse_mv)
 
-                            ax = fig.add_subplot(121)
-                            bp = ax.boxplot(mean_rmse_mv, showfliers=False, widths=0.45)
-                            #ax.set_title(metric + '_'+ samp + '_Algo_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars))
-                            ax.set_title('MVRMSE comparison')
-                            ax.set_xlabel('Approaches')
-                            #ax.set_ylabel(metric)
-                            ax.set_ylabel('MVRMSE')
-                            ax.set_xticklabels(approaches, rotation=75, fontsize=10)
-
-                            ax = fig.add_subplot(122)
-                            bp = ax.boxplot(mean_eh, showfliers=False, widths=0.45)
-                            #ax.set_title(metric + '_'+ samp + '_Algo_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars))
-                            ax.set_title('EH comparison')
-                            ax.set_xlabel('Approaches')
-                            #ax.set_ylabel(metric)
-                            ax.set_ylabel('EH')
-                            ax.set_xticklabels(approaches, rotation=75, fontsize=10)
-
-
-
-                            filename_fig = data_folder + '/test_runs/' + main_directory + '/' + 'MVRMSE_EH' + '_' + str(sample_size) + '_' + samp + '_' + algo + '_' + prob + '_' + str(
-                                    obj) + '_' + str(n_vars)
-                            
-                            if save_fig == 'png':
-                                fig.savefig(filename_fig + '.png', bbox_inches='tight')
-                            else:
-                                fig.savefig(filename_fig + '.pdf', bbox_inches='tight')
-                            ax.clear()
-
-                            """
-                            if plot_boxplot is True:
-                                if igd_all is None:
-                                    igd_all = igd_temp
-                                    rmse_mv_all = rmse_mv_sols_temp
-                                    solution_ratio_all = solution_ratio_temp
-                                    time_taken_all = time_taken_temp
+                                filename_fig = data_folder + '/test_runs/' + main_directory + '/' + 'MVRMSE_EH' + '_' + str(sample_size) + '_' + samp + '_' + algo + '_' + prob + '_' + str(
+                                        obj) + '_' + str(n_vars)
+                                
+                                if save_fig == 'png':
+                                    fig.savefig(filename_fig + '.png', bbox_inches='tight')
                                 else:
-                                    igd_all = np.vstack((igd_all, igd_temp))
-                                    rmse_mv_all = np.vstack((rmse_mv_all,rmse_mv_sols_temp))                            
-                                    solution_ratio_all = np.vstack((solution_ratio_all,solution_ratio_temp))
-                                    time_taken_all = np.vstack((time_taken_all,time_taken_temp))
+                                    fig.savefig(filename_fig + '.pdf', bbox_inches='tight')
+                                ax.clear()
 
-                            igd_all = np.transpose(igd_all)
-                            rmse_mv_all = np.transpose(rmse_mv_all)
-                            solution_ratio_all = np.transpose(solution_ratio_all)
-                            time_taken_all = np.transpose(time_taken_all)
 
-                        
-                            lenx = np.zeros(int(math.factorial(mode_length)/((math.factorial(mode_length-2))*2)))
-                            p_value_rmse =  copy.deepcopy(lenx)
-                            p_value_hv = copy.deepcopy(lenx)
-                            p_value_time = copy.deepcopy(lenx)
-                            p_cor_temp_hv =  copy.deepcopy(lenx)
-                            p_cor_temp_rmse = copy.deepcopy(lenx)
-                            p_cor_temp_time = copy.deepcopy(lenx)
-                            count = 0
-                            count_prev = 0
-                            for i in range(mode_length-1):
-                                for j in range(i+1,mode_length):
-                                    w, p1 = wilcoxon(x=igd_all[:, i], y=igd_all[:, j])
-                                    p_value_hv[count] = p1
-                                    w, p2 = wilcoxon(x=rmse_mv_all[:, i], y=rmse_mv_all[:, j])
-                                    p_value_rmse[count] = p2
-                                    w, p3 = wilcoxon(x=time_taken_all[:, i], y=time_taken_all[:, j])
-                                    p_value_time[count] = p3
-                                    count +=1
+                                lenx = np.zeros(int(math.factorial(mode_length)/((math.factorial(mode_length-2))*2)))
+                                p_value_rmse =  copy.deepcopy(lenx)
+                                p_value_eh = copy.deepcopy(lenx)
+                                p_cor_temp_eh =  copy.deepcopy(lenx)
+                                p_cor_temp_rmse = copy.deepcopy(lenx)
+                                count = 0
+                                count_prev = 0
+                                for i in range(mode_length-1):
+                                    for j in range(i+1,mode_length):
+                                        w, p1 = wilcoxon(x=mean_eh[:, i], y=mean_eh[:, j])
+                                        p_value_eh[count] = p1
+                                        w, p2 = wilcoxon(x=mean_rmse_mv[:, i], y=mean_rmse_mv[:, j])
+                                        p_value_rmse[count] = p2
+                                        count +=1
+                                    if perform_bonferonni is True:
+                                        if mod_p_val is True:
+                                            r, p_cor_temp_eh[count_prev:count], alps, alpb = multipletests(p_value_eh[count_prev:count], alpha=0.05, method='bonferroni',
+                                                                                is_sorted=False, returnsorted=False)
+                                            r, p_cor_temp_rmse[count_prev:count], alps, alpb = multipletests(p_value_rmse[count_prev:count], alpha=0.05, method='bonferroni',
+                                                                                is_sorted=False, returnsorted=False)
                                 if perform_bonferonni is True:
-                                    if mod_p_val is True:
-                                        r, p_cor_temp_hv[count_prev:count], alps, alpb = multipletests(p_value_hv[count_prev:count], alpha=0.05, method='bonferroni',
-                                                                            is_sorted=False, returnsorted=False)
-                                        r, p_cor_temp_rmse[count_prev:count], alps, alpb = multipletests(p_value_rmse[count_prev:count], alpha=0.05, method='bonferroni',
-                                                                            is_sorted=False, returnsorted=False)
-                                        r, p_cor_temp_time[count_prev:count], alps, alpb = multipletests(p_value_time[count_prev:count], alpha=0.05, method='bonferroni',
-                                                                            is_sorted=False, returnsorted=False)
-                                        count_prev = count
-                            if perform_bonferonni is True:
-                                p_cor_hv = p_cor_temp_hv
-                                p_cor_rmse = p_cor_temp_rmse
-                                p_cor_time = p_cor_temp_time
-                            else:
-                                p_cor_hv = p_value_hv
-                                p_cor_rmse = p_value_rmse
-                                p_cor_time = p_value_time
+                                    p_cor_eh = p_cor_temp_eh
+                                    p_cor_rmse = p_cor_temp_rmse
+                                current_index = [sample_size, samp, prob, obj, n_vars]
 
-                            if mod_p_val is False:
-                                r, p_cor_hv, alps, alpb = multipletests(p_value_hv, alpha=0.05, method='bonferroni', is_sorted=False,
-                                                                    returnsorted=False)
-                                r, p_cor_rmse, alps, alpb = multipletests(p_value_rmse, alpha=0.05, method='bonferroni', is_sorted=False,
-                                                                    returnsorted=False)
-                                r, p_cor_time, alps, alpb = multipletests(p_value_time, alpha=0.05, method='bonferroni', is_sorted=False,
-                                                                    returnsorted=False)
-                            current_index = [sample_size, samp, prob, obj, n_vars]
-                            ranking_hv = calc_rank(p_cor_hv, np.median(igd_all, axis=0),mode_length)
-                            ranking_rmse = calc_rank(p_cor_rmse, np.median(rmse_mv_all, axis=0)*-1,mode_length)
-                            ranking_time = calc_rank(p_cor_time, np.median(time_taken_all, axis=0)*-1,mode_length)
-                            #adding other indicators mean, median, std dev
-                            #p_cor = (np.asarray([p_cor, np.mean(igd_all, axis=0),
-                            #                             np.median(igd_all, axis=0),
-                            #                             np.std(igd_all, axis=0)])).flatten()
-                            p_cor_hv = np.hstack((p_cor_hv, np.mean(igd_all, axis=0),
-                                                        np.median(igd_all, axis=0),
-                                                        np.std(igd_all, axis=0), ranking_hv))
-                            p_cor_hv = np.hstack((current_index,p_cor_hv))
+                                ranking_eh = calc_rank(p_cor_eh, np.median(mean_eh, axis=0),mode_length)
+                                ranking_rmse = calc_rank(p_cor_rmse, np.median(mean_rmse_mv, axis=0)*-1,mode_length)
+                                
+                                p_cor_eh = np.hstack((p_cor_eh, np.mean(mean_eh, axis=0),
+                                                            np.median(mean_eh, axis=0),
+                                                            np.std(mean_eh, axis=0), ranking_eh))
+                                p_cor_eh = np.hstack((current_index, p_cor_eh))
 
-                            p_cor_rmse = np.hstack((p_cor_rmse, np.mean(rmse_mv_all, axis=0),
-                                                        np.median(rmse_mv_all, axis=0),
-                                                        np.std(rmse_mv_all, axis=0), ranking_rmse))
-                            p_cor_rmse = np.hstack((current_index,p_cor_rmse))
-
-                            p_cor_time = np.hstack((p_cor_time, np.mean(time_taken_all, axis=0),
-                                                        np.median(time_taken_all, axis=0),
-                                                        np.std(time_taken_all, axis=0), ranking_time))
-                            p_cor_time = np.hstack((current_index,p_cor_time))
-                            
-                            if p_vals_all_hv is None:
-                                p_vals_all_hv = p_cor_hv
-                                p_vals_all_rmse = p_cor_rmse
-                                p_vals_all_time = p_cor_time
-                            else:
-                                p_vals_all_hv = np.vstack((p_vals_all_hv, p_cor_hv))
-                                p_vals_all_rmse = np.vstack((p_vals_all_rmse, p_cor_rmse))
-                                p_vals_all_time = np.vstack((p_vals_all_time, p_cor_time))
+                                p_cor_rmse = np.hstack((p_cor_rmse, np.mean(mean_rmse_mv, axis=0),
+                                                            np.median(mean_rmse_mv, axis=0),
+                                                            np.std(mean_rmse_mv, axis=0), ranking_rmse))
+                                p_cor_rmse = np.hstack((current_index, p_cor_rmse))
                             
 
-
-                            ax = fig.add_subplot(131)
-                            bp = ax.boxplot(igd_all, showfliers=False, widths=0.45)
-                            #ax.set_title(metric + '_'+ samp + '_Algo_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars))
-                            ax.set_title('Hypervolume comparison')
-                            ax.set_xlabel('Approaches')
-                            #ax.set_ylabel(metric)
-                            ax.set_ylabel('Hypervolume')
-                            ax.set_xticklabels(approaches, rotation=75, fontsize=10)
-
-                            ax = fig.add_subplot(132)
-                            bp = ax.boxplot(rmse_mv_all, showfliers=False, widths=0.45)
-                            #ax.set_title(metric + '_'+ samp + '_Algo_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars))
-                            ax.set_title('Accuracy comparison')
-                            ax.set_xlabel('Approaches')
-                            #ax.set_ylabel(metric)
-                            ax.set_ylabel('RMSE_MV')
-                            ax.set_xticklabels(approaches, rotation=75, fontsize=10)
-
-                            print(time_taken_all)
-                            ax = fig.add_subplot(133)
-                            bp = ax.boxplot(time_taken_all, showfliers=False, widths=0.45)
-                            #ax.set_title(metric + '_'+ samp + '_Algo_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars))
-                            ax.set_title('Building time comparison')
-                            ax.set_xlabel('Approaches')
-                            #ax.set_ylabel(metric)
-                            ax.set_ylabel('Time(s)')
-                            ax.set_xticklabels(approaches, rotation=75, fontsize=10)
-
-                            if problem_testbench is 'DTLZ':
-                                filename_fig = './data/test_runs/' + main_directory + '/' + metric + '_' + str(sample_size) + '_' + samp + '_' + algo + '_' + prob + '_' + str(
-                                    obj) + '_' + str(n_vars)
-                            else:
-                                filename_fig = './data/test_runs/' + main_directory + '/' + metric + '_' + str(sample_size) + '_' + samp + '_' + algo + '_' + prob + '_' + str(
-                                    obj) + '_' + str(n_vars)
-
-                            if save_fig == 'png':
-                                fig.savefig(filename_fig + '.png', bbox_inches='tight')
-                            else:
-                                fig.savefig(filename_fig + '.pdf', bbox_inches='tight')
-                            ax.clear()
+                                if p_vals_all_eh is None:
+                                    p_vals_all_eh = p_cor_eh
+                                    p_vals_all_rmse = p_cor_rmse
+                                else:
+                                    p_vals_all_eh = np.vstack((p_vals_all_eh, p_cor_eh))
+                                    p_vals_all_rmse = np.vstack((p_vals_all_rmse, p_cor_rmse))
+                            except Exception as e:
+                                print(e) 
 
 
 if mod_p_val is False:
-    file_summary = './data/test_runs/' + main_directory + '/Summary_HV_' + problem_testbench + '.csv'
+    file_summary = data_folder + '/test_runs/' + main_directory + '/Summary_EH_' + problem_testbench + '.csv'
 else:
-    file_summary = './data/test_runs/' + main_directory + '/Summary_HV_ModP_' + problem_testbench + '.csv'
+    file_summary = data_folder + '/test_runs/' + main_directory + '/Summary_EH_ModP_' + problem_testbench + '.csv'
 with open(file_summary, 'w') as writeFile:
     writer = csv.writer(writeFile)
-    writer.writerows(p_vals_all_hv)
+    writer.writerows(p_vals_all_eh)
 writeFile.close()
 
 if mod_p_val is False:
-    file_summary = './data/test_runs/' + main_directory + '/Summary_RMSE_' + problem_testbench + '.csv'
+    file_summary = data_folder + '/test_runs/'+ main_directory + '/Summary_RMSE_' + problem_testbench + '.csv'
 else:
-    file_summary = './data/test_runs/' + main_directory + '/Summary_RMSE_ModP_' + problem_testbench + '.csv'
+    file_summary = data_folder + '/test_runs/'+ main_directory + '/Summary_RMSE_ModP_' + problem_testbench + '.csv'
 with open(file_summary, 'w') as writeFile:
     writer = csv.writer(writeFile)
     writer.writerows(p_vals_all_rmse)
 writeFile.close()
-
-if mod_p_val is False:
-    file_summary = './data/test_runs/' + main_directory + '/Summary_TIME_' + problem_testbench + '.csv'
-else:
-    file_summary = './data/test_runs/' + main_directory + '/Summary_TIME_ModP_' + problem_testbench + '.csv'
-with open(file_summary, 'w') as writeFile:
-    writer = csv.writer(writeFile)
-    writer.writerows(p_vals_all_time)
-writeFile.close()
-"""
 
 

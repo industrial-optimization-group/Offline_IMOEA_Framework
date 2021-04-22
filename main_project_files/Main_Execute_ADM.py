@@ -44,7 +44,7 @@ from pyDOE import lhs
 import copy
 
 data_folder = '/home/amrzr/Work/Codes/data'
-init_folder = data_folder + '/initial_samples_old'
+init_folder = data_folder + '/initial_samples_109'
 
 def compute_nadir(population):
     max_gen = None
@@ -106,11 +106,14 @@ def read_dataset(problem_testbench, problem_name, nobjs, nvars, sampling, nsampl
 def run_adm(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, is_data, approaches, run):
 
     # ADM parameters
-    L = 5  # number of iterations for the learning phase
+    L = 10  # number of iterations for the learning phase
     D = 5  # number of iterations for the decision phase
     lattice_res_options = [49, 13, 7, 5, 4, 3, 3, 3, 3]
-    lattice_resolution = lattice_res_options[nobjs-1]  # density variable for creating reference vectors
-    num_gen_per_iter = 50
+    if nobjs < 11:   # density variable for creating reference vectors
+        lattice_resolution = lattice_res_options[nobjs- 2]
+    else:
+        lattice_resolution = 3
+    num_gen_per_iter = 100
     num_approaches = len(approaches)
     dict_moea_objs = {}
     dict_pref_int_moea = {}

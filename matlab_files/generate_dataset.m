@@ -1,19 +1,25 @@
 clear all;
 
-Mobj=[9]%,4,5,6,8,10]; %,5];
+Mobj=[5,7,9]%,4,5,6,8,10]; %,5];
+
 %Mobj = [3,5,7]
-num_vars = [2, 5, 7, 10, 20] %,8,10];
+%num_vars = [2, 5, 7, 10, 20] %,8,10];
+num_vars = [10];
+
 %managements = {'1','7','8'}; %,'Offline_m5_ibea','Offline_ei2_ibea'}; %'Offline_m3','Offline_m5','Offline_m6','Offline_m3_ei','Offline_m3_ei2'}; %,'Offline_m3','Offline_m4'}; %'Offline_m2','Offline_m1','Offline_m3'}; %,
 Strategies = {'MVNORM', 'LHS'};
-Problems = {'P1','P2','P3','P4'};
+
+Problems = {'P1','P2','P3','P4', 'P5'};
+
 Runs=35;
 %Design='LHS';
 %Design='Random';
-sample_sizes = [2000, 10000, 50000];
+%sample_sizes = [2000, 10000, 50000];
+sample_sizes = [109]
 
 %load Initial_Population_DDMOPP_LHS_AM_109.mat
-
-
+%folder = '../data/initial_samples'
+folder = '~/Work/Codes/data/initial_samples_109'
 
 for ss = 1:length(sample_sizes)
     sample_size = sample_sizes(ss);
@@ -27,7 +33,7 @@ for ss = 1:length(sample_sizes)
 
                   for strat = 1:length(Strategies)
                     Strategy=Strategies{strat};
-                    load(['../data/initial_samples/Initial_Population_DDMOPP_' Strategy '_AM_' num2str(nvars) '_' num2str(sample_size) '.mat'])
+                    load([folder '/Initial_Population_DDMOPP_' Strategy '_AM_' num2str(nvars) '_' num2str(sample_size) '.mat'])
                     num_objectives=M
                     num_dimensions=nvars
                     curvature=false
@@ -42,7 +48,10 @@ for ss = 1:length(sample_sizes)
                         number_of_dominance_resistance_regions=0                    
                     elseif Problem == "P4"
                         number_of_disconnected_set_regions=0
-                        number_of_dominance_resistance_regions=1                    
+                        number_of_dominance_resistance_regions=1
+                    elseif Problem == "P5"
+                        number_of_disconnected_set_regions=1
+                        number_of_dominance_resistance_regions=1  
                     end
                     number_of_local_fronts=0                
                     number_of_discontinuous_regions=0
@@ -70,8 +79,8 @@ for ss = 1:length(sample_sizes)
 
                         end
                         Obj_vals_DDMOPP
-                        save(strcat('../data/initial_samples/DDMOPP_Params_',Strategy,'_',Problem,'_',num2str(M),'_',num2str(nvars),'_',num2str(sample_size),'.mat'), 'problem_parameters')
-                        save(strcat('../data/initial_samples/Obj_vals_DDMOPP_',Strategy,'_AM_',Problem,'_', num2str(M), '_', num2str(nvars),'_',num2str(sample_size),'.mat'),'Obj_vals_DDMOPP');
+                        save(strcat(folder,'/DDMOPP_Params_',Strategy,'_',Problem,'_',num2str(M),'_',num2str(nvars),'_',num2str(sample_size),'.mat'), 'problem_parameters')
+                        save(strcat(folder,'/Obj_vals_DDMOPP_',Strategy,'_AM_',Problem,'_', num2str(M), '_', num2str(nvars),'_',num2str(sample_size),'.mat'),'Obj_vals_DDMOPP');
                   end
             end
         end
