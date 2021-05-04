@@ -3,6 +3,7 @@ from desdeo_problem.Problem import DataProblem
 from desdeo_problem.surrogatemodels.SurrogateModels import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import Matern
 from desdeo_emo.EAs.OfflineRVEA import ProbRVEAv3
+from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv3 as ProbRVEA_1
 from desdeo_emo.EAs.OfflineRVEA import RVEA
 
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
@@ -31,7 +32,7 @@ def build_models(x, y):
 
 def interactive_optimize_test(problem, path):
     #evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=10)
-    evolver_opt = ProbRVEAv3(problem, use_surrogates=True, interact=True, n_gen_per_iter=10)
+    evolver_opt = ProbRVEA_1(problem, use_surrogates=True, interact=True, n_gen_per_iter=10)
     plot, pref = evolver_opt.requests()   
     pref_last = None 
     while evolver_opt.continue_evolution():
@@ -60,12 +61,12 @@ def compute_nadir(population):
 
 
 def interactive_optimize(problem, gen_per_iter, max_iter, path):
-    #evolver_opt = ProbRVEAv3(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
-    evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+    evolver_opt = ProbRVEA_1(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+    #evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
     plot, pref = evolver_opt.requests()   
     pref_last = None
     ideal = None
-    ideal_prev = np.zeros(problem.n_of_objectives)
+    ideal_prev = np.ones(problem.n_of_objectives)*0
     nadir = None
     while evolver_opt.continue_evolution():
         print("Iteration Count:")
