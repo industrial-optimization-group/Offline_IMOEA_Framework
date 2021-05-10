@@ -21,8 +21,11 @@ class FullGPRegressor(BaseRegressor):
         if y.ndim == 1:
             y = y.reshape(-1, 1)
         kernel = GPy.kern.Matern52(np.shape(X)[1], ARD=True) #+ GPy.kern.White(2)
+        #kernel = GPy.kern.RBF(np.shape(X)[1], variance=1., lengthscale=1.)
         self.m = GPy.models.GPRegression(X,y, kernel=kernel)
         self.m.optimize('bfgs')
+        #self.m.optimize(messages=True,max_f_eval = 100000)
+        #self.m.optimize_restarts(num_restarts = 10)
 
     def predict(self, X):
         #y_mean, y_stdev = np.asarray(self.m.predict(X)[0]).reshape(1,-1)

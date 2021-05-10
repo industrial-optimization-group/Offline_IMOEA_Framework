@@ -66,7 +66,7 @@ def interactive_optimize(problem, gen_per_iter, max_iter, path):
     plot, pref = evolver_opt.requests()   
     pref_last = None
     ideal = None
-    ideal_prev = np.ones(problem.n_of_objectives)*0
+    ideal_prev = np.ones(problem.n_of_objectives)*-100
     nadir = None
     while evolver_opt.continue_evolution():
         print("Iteration Count:")
@@ -293,6 +293,8 @@ def uncertainty_interaction(evolver_opt, pref, path):
 
     # Convert uncertainty to indifference
     unc_arch_percent = np.abs((1.96*unc_arch/obj_arch)*100)
+    unc_arch_lower = obj_arch - 1.96*unc_arch
+    unc_arch_upper = obj_arch + 1.96*unc_arch
     min_uncertainty = np.min(unc_arch_percent, axis=0)
     max_uncertainty = np.max(unc_arch_percent, axis=0)
     thresholds = np.ones_like(evolver_opt.population.ideal_fitness_val)*np.inf
@@ -479,6 +481,15 @@ def uncertainty_interaction(evolver_opt, pref, path):
                     delimiter=",")
         np.savetxt(path+'/Unc_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
                     + '_' + str(count_interaction_thresh) + '.csv', unc_arch[loc],
+                    delimiter=",")
+        np.savetxt(path+'/Unc_percent_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
+                    + '_' + str(count_interaction_thresh) + '.csv', unc_arch_percent[loc],
+                    delimiter=",")
+        np.savetxt(path+'/Unc_lower_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
+                    + '_' + str(count_interaction_thresh) + '.csv', unc_arch_lower[loc],
+                    delimiter=",")
+        np.savetxt(path+'/Unc_upper_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
+                    + '_' + str(count_interaction_thresh) + '.csv', unc_arch_upper[loc],
                     delimiter=",")
         np.savetxt(path+'/Indiv_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
                     + '_' + str(count_interaction_thresh) + '.csv', indiv_arch[loc],
