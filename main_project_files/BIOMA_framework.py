@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 from non_domx import ndx
 import plot_interactive as plt_int2
+import plot3d_confidence as plt_int3
 import plot_reference_vectors as plt_refv
 
 
@@ -403,6 +404,17 @@ def uncertainty_interaction(evolver_opt, pref, path):
         unc_avg_all = np.mean(unc_arch_all, axis=1)
         unc_avg_all_max = np.max(unc_avg_all)
         unc_avg_all_min = np.min(unc_avg_all)
+
+        plt_int2.plot_vals(objs=obj_arch2,
+                    unc=unc_arch2,
+                    preference=pref,
+                    iteration=evolver_opt._iteration_counter,
+                    interaction_count=-3,
+                    min=unc_avg_all_min,
+                    max=unc_avg_all_max,
+                    ideal=evolver_opt.population.ideal_fitness_val,
+                    nadir=evolver_opt.population.nadir_fitness_val,path=path)
+
         plt_int2.plot_vals(objs=obj_arch_all,
                             unc=unc_arch_all,
                             preference=pref,
@@ -423,6 +435,16 @@ def uncertainty_interaction(evolver_opt, pref, path):
                             ideal=evolver_opt.population.ideal_fitness_val,
                             nadir=evolver_opt.population.nadir_fitness_val,path=path)
 
+        plt_int3.plot_vals(objs=obj_arch,
+                    unc=unc_arch,
+                    preference=pref,
+                    iteration=evolver_opt._iteration_counter,
+                    interaction_count=-1,
+                    min=unc_avg_all_min,
+                    max=unc_avg_all_max,
+                    ideal=evolver_opt.population.ideal_fitness_val,
+                    nadir=evolver_opt.population.nadir_fitness_val,path=path)
+
 
         plt_int2.plot_vals(objs=obj_arch,
                             unc=unc_arch,
@@ -433,16 +455,18 @@ def uncertainty_interaction(evolver_opt, pref, path):
                             max=unc_avg_all_max,
                             ideal=evolver_opt.population.ideal_fitness_val,
                             nadir=evolver_opt.population.nadir_fitness_val,path=path)
+        
+        plt_int3.plot_vals(objs=obj_arch,
+                    unc=unc_arch,
+                    preference=pref,
+                    iteration=evolver_opt._iteration_counter,
+                    interaction_count=0,
+                    min=unc_avg_all_min,
+                    max=unc_avg_all_max,
+                    ideal=evolver_opt.population.ideal_fitness_val,
+                    nadir=evolver_opt.population.nadir_fitness_val,path=path)
 
-        plt_int2.plot_vals(objs=obj_arch2,
-                            unc=unc_arch2,
-                            preference=pref,
-                            iteration=evolver_opt._iteration_counter,
-                            interaction_count=-3,
-                            min=unc_avg_all_min,
-                            max=unc_avg_all_max,
-                            ideal=evolver_opt.population.ideal_fitness_val,
-                            nadir=evolver_opt.population.nadir_fitness_val,path=path)
+
         
 
 
@@ -530,6 +554,16 @@ def uncertainty_interaction(evolver_opt, pref, path):
                                 ideal=evolver_opt.population.ideal_fitness_val,
                                 nadir=evolver_opt.population.nadir_fitness_val,
                                 path=path)
+            plt_int3.plot_vals(objs=obj_arch[loc],
+                    unc=unc_arch[loc],
+                    preference=pref,
+                    iteration=evolver_opt._iteration_counter,
+                    interaction_count=count_interaction_thresh,
+                    min=unc_avg_all_min,
+                    max=unc_avg_all_max,
+                    ideal=evolver_opt.population.ideal_fitness_val,
+                    nadir=evolver_opt.population.nadir_fitness_val,
+                    path=path)
             """
             fig_obj = plt_int.animate_parallel_coords_next_(data=obj_arch[loc],
                                                     data_unc=unc_arch[loc],
