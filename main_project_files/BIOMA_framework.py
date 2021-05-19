@@ -435,15 +435,15 @@ def uncertainty_interaction(evolver_opt, pref, path):
                             ideal=evolver_opt.population.ideal_fitness_val,
                             nadir=evolver_opt.population.nadir_fitness_val,path=path)
 
-        plt_int3.plot_vals(objs=obj_arch,
-                    unc=unc_arch,
-                    preference=pref,
-                    iteration=evolver_opt._iteration_counter,
-                    interaction_count=-1,
-                    min=unc_avg_all_min,
-                    max=unc_avg_all_max,
-                    ideal=evolver_opt.population.ideal_fitness_val,
-                    nadir=evolver_opt.population.nadir_fitness_val,path=path)
+        plt_int3.plot_vals(objs=obj_arch_pref,
+                            unc=unc_arch_pref,
+                            preference=pref,
+                            iteration=evolver_opt._iteration_counter,
+                            interaction_count=-1,
+                            min=unc_avg_all_min,
+                            max=unc_avg_all_max,
+                            ideal=evolver_opt.population.ideal_fitness_val,
+                            nadir=evolver_opt.population.nadir_fitness_val,path=path)
 
 
         plt_int2.plot_vals(objs=obj_arch,

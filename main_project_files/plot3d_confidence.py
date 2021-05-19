@@ -14,17 +14,19 @@ def plot_vals(objs, unc, preference, iteration, interaction_count, ideal, nadir,
     #objs = np.random.rand(10,3)*20
     #unc = np.random.rand(10,3)
     #preference = np.array([2,2,2])
-    ideal = np.array([-100,-100,-100])
-    nadir = np.array([-50,-50,-50])
-    min = np.min(unc,axis=1)
-    max = np.max(unc,axis=1)
+    #ideal = np.array([-100,-100,-100])
+    #nadir = np.array([-50,-50,-50])
+    ideal = np.repeat(np.min(objs),3)
+    nadir = np.repeat(np.max(objs),3)
+
     
     columns = ["f_"+str(i+1) for i in range(np.shape(objs)[1])]
     range_plot = np.vstack((ideal,nadir))
     range_plot = np.hstack((range_plot,[[3],[3]]))
     if np.shape(objs)[0] > 0:
         unc_avg = np.mean(unc, axis=1)
-
+        min = np.min(unc_avg)
+        max = np.max(unc_avg)
         #unc_avg = (unc_avg-np.min(unc_avg))/(np.max(unc_avg)-np.min(unc_avg))
         unc_avg = (unc_avg - min) / (max-min)
         objs_col = unc_avg.reshape(-1, 1)
@@ -73,7 +75,7 @@ def plot_vals(objs, unc, preference, iteration, interaction_count, ideal, nadir,
     ))
     plot(fig, filename= path + "/3Dscatter_" + str(iteration) + "_" + str(interaction_count) + ".html")
 
-
+    cdata= np.hstack((unc3,objs1))
     fig1 = make_subplots(rows=1, cols=3)
     fig1.add_trace(go.Scatter(x=objs1[:,0], y=objs1[:,1],
                         error_x=dict(array=unc2[:,0], color='purple'),
@@ -88,13 +90,14 @@ def plot_vals(objs, unc, preference, iteration, interaction_count, ideal, nadir,
             cmax=3
             ),
 
-        customdata  = unc3,
+        customdata  = cdata,
         hovertemplate =
         '<br><b>f_1</b>: %{x:.2f}<br>'+
         '<br><b>f_2</b>: %{y:.2f}<br>'+
+        '<br><b>f_3</b>: %{customdata[5]}}<br>'+
         '<br><b>Unc_1</b>: %{customdata[0]}<br>'+
-        '<br><b>Unc_2</b>: %{customdata[1]}<br>'
-    
+        '<br><b>Unc_2</b>: %{customdata[1]}<br>'+
+        '<br><b>Unc_3</b>: %{customdata[2]}<br>'
         ),row=1, col=1)
     fig1.update_xaxes(title_text="f_1", row=1, col=1)
     fig1.update_yaxes(title_text="f_2", row=1, col=1)
@@ -112,13 +115,14 @@ def plot_vals(objs, unc, preference, iteration, interaction_count, ideal, nadir,
             cmax=3
             ),
 
-        customdata  = unc3,
+        customdata  = cdata,
         hovertemplate =
-        '<br><b>f_1</b>: %{x:.2f}<br>'+
-        '<br><b>f_2</b>: %{y:.2f}<br>'+
+        '<br><b>f_2</b>: %{x:.2f}<br>'+
+        '<br><b>f_3</b>: %{y:.2f}<br>'+
+        '<br><b>f_1</b>: %{customdata[3]}}<br>'+
+        '<br><b>Unc_1</b>: %{customdata[0]}<br>'+
         '<br><b>Unc_2</b>: %{customdata[1]}<br>'+
         '<br><b>Unc_3</b>: %{customdata[2]}<br>'
-    
         ),row=1, col=2)
     fig1.update_xaxes(title_text="f_2", row=1, col=2)
     fig1.update_yaxes(title_text="f_3", row=1, col=2)
@@ -136,13 +140,14 @@ def plot_vals(objs, unc, preference, iteration, interaction_count, ideal, nadir,
             cmax=3
             ),
 
-        customdata  = unc3,
+        customdata  = cdata,
         hovertemplate =
         '<br><b>f_1</b>: %{x:.2f}<br>'+
-        '<br><b>f_2</b>: %{y:.2f}<br>'+
+        '<br><b>f_3</b>: %{y:.2f}<br>'+
+        '<br><b>f_2</b>: %{customdata[4]}}<br>'+
         '<br><b>Unc_1</b>: %{customdata[0]}<br>'+
+        '<br><b>Unc_2</b>: %{customdata[1]}<br>'+
         '<br><b>Unc_3</b>: %{customdata[2]}<br>'
-    
         ),row=1, col=3)
     fig1.update_xaxes(title_text="f_1", row=1, col=3)
     fig1.update_yaxes(title_text="f_3", row=1, col=3)
