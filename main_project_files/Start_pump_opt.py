@@ -18,23 +18,31 @@ import scipy.io
 from sklearn.neighbors import NearestNeighbors
 import time
 import GPy
-from BIOMA_framework import interactive_optimize
+#from BIOMA_framework import interactive_optimize
+from BIOMA_framework_worst import interactive_optimize
 import copy
 
 max_iters = 5
 gen_per_iter=10
 nobjs = 3 
 nvars = 22
-main_directory = 'Pump_Test_Tomas_1'
+#main_directory = 'Pump_Test_Tomas_2_140'
+main_directory = 'Pump_Test_Tomas_3_140_all'
 data_folder = '/home/amrzr/Work/Codes/data'
-data_file = data_folder+'/pump_data/01_DOE_data.csv'
+#data_file = data_folder+'/pump_data/01_DOE_data.csv'
+#data_file = data_folder+'/pump_data/02_DOE_140_data.csv'
+data_file = data_folder+'/pump_data/03_DOE_140_all_data.csv'
 path = data_folder + '/test_runs/' + main_directory
 
 df = pd.read_csv(data_file)
 df[['f1','f2','f3']] = df[['f1','f2','f3']]*-1
 
-x_low = [20, 0.2, 0.22, 0.25, -5, 85, 355, 450, 15, 15, -10, 16, 0.25, 0.2, 0.25, -5, 85, 450, 15, 15, 27, -15]
-x_high = [30, 0.72, 0.76 , 0.8 , 0 , 90, 380 , 600, 45 , 50,10 , 26, 0.76, 0.7 ,0.76, 0 ,90 ,600 ,60 ,50 ,35 ,5]
+#x_low = [20, 0.2, 0.22, 0.25, -5, 85, 355, 450, 15, 15, -10, 16, 0.25, 0.2, 0.25, -5, 85, 450, 15, 15, 27, -15]
+#x_high = [30, 0.72, 0.76 , 0.8 , 0 , 90, 380 , 600, 45 , 50,10 , 26, 0.76, 0.7 ,0.76, 0 ,90 ,600 ,60 ,50 ,35 ,5]
+
+x_low = np.ones(22)*0
+x_high = np.ones(22)
+
 x_low_new = np.ones(22)*0
 x_high_new = np.ones(22)
 

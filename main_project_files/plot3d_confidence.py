@@ -75,6 +75,7 @@ def plot_vals(objs, unc, preference, iteration, interaction_count, ideal, nadir,
     ))
     plot(fig, filename= path + "/3Dscatter_" + str(iteration) + "_" + str(interaction_count) + ".html")
 
+    ############### Plot scatter matrix with confidence intervals ######################
     cdata= np.hstack((unc3,objs1))
     fig1 = make_subplots(rows=1, cols=3)
     fig1.add_trace(go.Scatter(x=objs1[:,0], y=objs1[:,1],
@@ -154,3 +155,4 @@ def plot_vals(objs, unc, preference, iteration, interaction_count, ideal, nadir,
 
     plot(fig1, filename= path + "/3Dmatrix_" + str(iteration) + "_" + str(interaction_count) + ".html")
     print('Plotting done!!')
+
