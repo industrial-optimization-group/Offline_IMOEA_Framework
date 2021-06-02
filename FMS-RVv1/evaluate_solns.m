@@ -4,9 +4,9 @@ close all;
 
 plot_init=0
 is_plot=0
-plot_progress = 1;
+plot_progress = 0;
 write_initsamples=0;
-write_all_samples=1;
+write_all_samples=0;
 write_all_samples_data=0;
 
 %Problems = {'DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
@@ -16,8 +16,8 @@ write_all_samples_data=0;
 %Problems = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9' };
 %Problems = {'DTLZ4'};
 %Problems = {'DTLZ2','DTLZ5'};
-%Problems = {'P1','P2'};
-Problems = {'P2'};
+Problems = {'P1','P2'};
+%Problems = {'P2'};
 
 Benchmark = 'DDMOPP'; %,'DTLZ'};
 %Benchmark = 'DTLZ';
@@ -25,8 +25,8 @@ Benchmark = 'DDMOPP'; %,'DTLZ'};
 Algorithms = {'RVEA'}; %'IBEA'
 %Algorithms = {'IBEA'}; %'IBEA'
 
-%Mobj=[2,3,4,5,6,8,10]; %,5];
-Mobj = [8]%,5];
+Mobj=[2,3,4,5,6,8,10]; %,5];
+%Mobj = [8]%,5];
 %Mobj=[2,3,5,8];
 num_vars = [10];
 sample_size = 109;
@@ -37,18 +37,18 @@ sample_size = 109;
 %managements = {'1','7'}
 managements = {'9'}
 
-%Strategies = {'LHS','MVNORM'};
+Strategies = {'LHS','MVNORM'};
 %Strategies = {'LHS'};
-Strategies = {'MVNORM'}
-main_folder='Tests_Probabilistic_Finalx_new';
+%Strategies = {'MVNORM'}
+main_folder='Tests_Probabilistic_Rev2';
 %main_folder='Tests_soln_plot'
 %main_folder='Tests_CSC_2'
-init_folder='../AM_Samples_109_Final';
-run_folder='../Tests_Probabilistic_Finalx_new';
+init_folder='~/Work/Codes/Offline_IMOEA_Framework/AM_Samples_109_Final';
+run_folder='~/Work/Codes/Tests_Probabilistic_Rev2';
 %run_folder='../Tests_soln_plot'
 %run_folder='../Tests_CSC_2'
 
-RunNum = 1;
+RunNum = 31;
 %med_index=[2,9,4,4];
 
 D = 10;

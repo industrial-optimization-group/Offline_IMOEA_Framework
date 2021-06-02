@@ -42,7 +42,7 @@ folder_data = 'AM_Samples_109_Final'
 problem_testbench = 'DDMOPP'
 
 #main_directory = 'Offline_Prob_DDMOPP3'
-main_directory = 'Tests_Probabilistic_Finalx_new'
+main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
 #main_directory = 'Tests_CSC_4'
 #main_directory = 'Tests_new_adapt'
 #main_directory = 'Tests_toys'
@@ -115,8 +115,8 @@ hv_ref = {"DTLZ2": {"2": [3, 3], "3": [3, 3, 3], "5": [3, 3, 3, 3, 3], "8": [3, 
           "DTLZ7": {"2": [1, 20], "3": [1, 1, 30], "5": [1, 1, 1, 1, 45], "8": [1, 1, 1, 1, 1, 1, 1, 90]}}
 
 
-nruns = 11
-pool_size = nruns
+nruns = 31
+pool_size = 3
 
 plot_boxplot = True
 

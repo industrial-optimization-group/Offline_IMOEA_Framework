@@ -5,8 +5,6 @@ from joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 import csv
 from IGD_calc import igd, igd_plus
-from pymop.problems.welded_beam import WeldedBeam
-from pymop.problems.truss2d import Truss2D
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 from sklearn.metrics import r2_score
@@ -35,7 +33,7 @@ mod_p_val = True
 #problem_testbench = 'DTLZ'
 problem_testbench = 'DDMOPP'
 
-main_directory = 'Tests_Probabilistic_Finalx_new'
+main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
 #main_directory = 'Tests_additional_obj1'
 #main_directory = 'O_Nautilus_Runs'
 #main_directory = 'Tests_Final'
@@ -89,8 +87,8 @@ approaches = ['TL','GenRVEA','ProbRVEA','HybRVEA','GenMOEA/D','ProbMOEA/D','HybM
 #approaches = ['TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA']
 
 
-nruns = 11
-pool_size = nruns
+nruns = 31
+pool_size = 4
 rmsemvr = True
 plot_boxplot = True
 p_vals_all = None
@@ -117,16 +115,6 @@ def objf(name, num_of_objectives_real,  num_of_variables, x):
 
     elif name == "DTLZ7":
         obj_val = dtlz.DTLZ7(num_of_objectives_real, num_of_variables)(x)
-
-    elif name == "WELDED_BEAM":
-        problem_weld = WeldedBeam()
-        F, G = problem_weld.evaluate(x)
-        obj_val = F
-
-    elif name == "TRUSS2D":
-        problem_truss = Truss2D()
-        F, G = problem_truss.evaluate(x)
-        obj_val = F
 
     return obj_val
 

@@ -5,8 +5,6 @@ import os
 from joblib import Parallel, delayed
 from non_domx import ndx
 from optproblems import dtlz
-from pymop.problems.welded_beam import WeldedBeam
-from pymop.problems.truss2d import Truss2D
 #import matlab_wrapper2.matlab_wrapper as matlab_wrapper
 import csv
 
@@ -20,34 +18,34 @@ problem_testbench = 'DDMOPP'
 
 #main_directory = 'Tests_soln_plot'
 #main_directory = 'Offline_Prob_DDMOPP3'
-main_directory = 'Tests_Probabilistic_Finalx_new'
+main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
 #main_directory = 'Tests_CSC_3'
 #main_directory = 'Tests_additional_obj1'
 #main_directory = 'Tests_new_adapt'
 #main_directory = 'Tests_toys'
 
-#objectives = [2]
+#objectives = [8]
 #objectives = [2,3,5,8]
 objectives = [2,3,4,5,6,8,10]
 
 #problems = ['DTLZ2']
 #problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 problems = ['P1','P2']
-#problems = ['P1']
+#problems = ['P2']
 #problems = ['WELDED_BEAM'] #dims=4
 #problems = ['TRUSS2D'] #dims=3
 
 #modes = [1, 2, 3]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2, 7 = Approach_Prob
-#modes = [1,7,8]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2
-#modes = [1,7]
-modes = [12,72,82]
+modes = [1,7,8]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2
+#modes = [1]
+#modes = [1,7,8,12,72,82]
 
 #sampling = ['BETA', 'MVNORM']
 #sampling = ['LHS']
 #sampling = ['BETA','OPTRAND','MVNORM']
 #sampling = ['OPTRAND']
-#sampling = ['MVNORM']
-sampling = ['LHS', 'MVNORM']
+sampling = ['MVNORM']
+#sampling = ['LHS', 'MVNORM']
 
 #emo_algorithm = ['RVEA','IBEA']
 emo_algorithm = ['RVEA']
@@ -60,8 +58,8 @@ emo_algorithm = ['RVEA']
 
 #############################################
 
-nruns = 11
-pool_size = nruns
+nruns = 31
+pool_size = 3
 
 
 def fx(name, num_of_objectives_real, num_of_variables, x):
@@ -87,22 +85,6 @@ def fx(name, num_of_objectives_real, num_of_variables, x):
     elif name == "DTLZ7":
         obj_val = dtlz.DTLZ7(num_of_objectives_real, num_of_variables)(x)
 
-    elif name == "WELDED_BEAM":
-        problem_weld = WeldedBeam()
-        F, G = problem_weld.evaluate(x)
-        obj_val = F
-
-    elif name == "TRUSS2D":
-        problem_truss = Truss2D()
-        F, G = problem_truss.evaluate(x)
-        obj_val = F
-
-    elif name == "DDMOPP_P1_2":
-        matlab = matlab_wrapper.MatlabSession()
-        matlab.put('x', x)
-        matlab.eval('evaluate_DDMOPP')
-        obj_val = matlab.get('y')
-
     return obj_val
 
 
@@ -115,6 +97,7 @@ def parallel_execute(run, path_to_file, prob, obj,mode):
     infile.close()
     individual_archive = results_data["individual_archive"]
     objective_archive = results_data["objectives_archive"]
+    #print(objective_archive)
     uncertainty_archive = results_data["uncertainty_archive"]
     if type(individual_archive) is dict:
         individual_archive=np.vstack(individual_archive.values())

@@ -3,10 +3,7 @@ import numpy as np
 import pickle
 import os
 from joblib import Parallel, delayed
-from non_domx import ndx
 from optproblems import dtlz
-from pymop.problems.welded_beam import WeldedBeam
-from pymop.problems.truss2d import Truss2D
 #import matlab_wrapper2.matlab_wrapper as matlab_wrapper
 import csv
 
@@ -14,32 +11,32 @@ dims = [10]
 # dims = 4
 ############################################
 folder_data = 'AM_Samples_109_Final'
-problem_testbench = 'DTLZ'
-#problem_testbench = 'DDMOPP'
+#problem_testbench = 'DTLZ'
+problem_testbench = 'DDMOPP'
 
 #main_directory = 'Offline_Prob_DDMOPP3'
-main_directory = 'Tests_Probabilistic_Finalx_new'
+main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
 #main_directory = 'Tests_additional_obj1'
 #main_directory = 'Tests_new_adapt'
 #main_directory = 'Tests_toys'
 #main_directory = 'Tests_CSC_4'
 
 #objectives = [3,4,5,8]
-objectives = [2,3,5,8]
-#objectives = [2,3,4,5,6,8,10]
+#objectives = [2,3,5,8]
+objectives = [2,3,4,5,6,8,10]
 
 #problems = ['DTLZ6']
-problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
-#problems = ['P1','P2']
+#problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
+problems = ['P1','P2']
 #problems = ['P1']
 #problems = ['WELDED_BEAM'] #dims=4
 #problems = ['TRUSS2D'] #dims=3
 
 #modes = [1, 2, 3]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2, 7 = Approach_Prob
-#modes = [7]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2
+modes = [1,7,8]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2
 #modes = [823,723]
 #modes = [12102,72102,82102]
-modes = [12,72,82]
+#modes = [1, 7, 8, 12, 72, 82]
 
 
 #sampling = ['BETA', 'MVNORM']
@@ -60,8 +57,8 @@ emo_algorithm = ['RVEA']
 
 #############################################
 
-nruns = 11
-pool_size = nruns
+nruns = 31
+pool_size = 3
 
 
 def f(name, num_of_objectives_real, num_of_variables, x):
@@ -86,22 +83,6 @@ def f(name, num_of_objectives_real, num_of_variables, x):
 
     elif name == "DTLZ7":
         obj_val = dtlz.DTLZ7(num_of_objectives_real, num_of_variables)(x)
-
-    elif name == "WELDED_BEAM":
-        problem_weld = WeldedBeam()
-        F, G = problem_weld.evaluate(x)
-        obj_val = F
-
-    elif name == "TRUSS2D":
-        problem_truss = Truss2D()
-        F, G = problem_truss.evaluate(x)
-        obj_val = F
-
-    elif name == "DDMOPP_P1_2":
-        matlab = matlab_wrapper.MatlabSession()
-        matlab.put('x', x)
-        matlab.eval('evaluate_DDMOPP')
-        obj_val = matlab.get('y')
 
     return obj_val
 
