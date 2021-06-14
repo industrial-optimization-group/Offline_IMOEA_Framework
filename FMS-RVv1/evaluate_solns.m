@@ -4,17 +4,17 @@ close all;
 
 plot_init=0
 is_plot=0
-plot_progress = 0;
+plot_progress = 1;
 write_initsamples=0;
-write_all_samples=0;
+write_all_samples=1;
 write_all_samples_data=0;
-
+write_final_solns=0
 %Problems = {'DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
 % Problems = {'DTLZ1','DTLZ2','DTLZ3','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
 %Problems = {'DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7'};
 %Problems = {'WFG1','WFG2','WFG3','WFG5','WFG9' };
 %Problems = {'WFG1','WFG2','WFG3','WFG4','WFG5','WFG6','WFG7','WFG8','WFG9' };
-%Problems = {'DTLZ4'};
+%Problems = {'DTLZ2'};
 %Problems = {'DTLZ2','DTLZ5'};
 Problems = {'P1','P2'};
 %Problems = {'P2'};
@@ -26,16 +26,17 @@ Algorithms = {'RVEA'}; %'IBEA'
 %Algorithms = {'IBEA'}; %'IBEA'
 
 Mobj=[2,3,4,5,6,8,10]; %,5];
-%Mobj = [8]%,5];
+%Mobj = [2]%,5];
 %Mobj=[2,3,5,8];
 num_vars = [10];
 sample_size = 109;
 %managements = {'1','9','7','8'}; %,'Offline_m5_ibea','Offline_ei2_ibea'}; %'Offline_m3','Offline_m5','Offline_m6','Offline_m3_ei','Offline_m3_ei2'}; %,'Offline_m3','Offline_m4'}; %'Offline_m2','Offline_m1','Offline_m3'}; %,
-%managements = {'1','7','8'}; 
-%managements = {'1','9','7','8','12','72'};
+%%managements = {'1','7','8'}; 
+%managements = {'0','9','1','7','8','12','72','82'};
+%managements = {'1','7','8','12','72','82'};
 %managements = {'12','72','82'};
 %managements = {'1','7'}
-managements = {'9'}
+managements = {'0'}
 
 Strategies = {'LHS','MVNORM'};
 %Strategies = {'LHS'};
@@ -48,7 +49,7 @@ run_folder='~/Work/Codes/Tests_Probabilistic_Rev2';
 %run_folder='../Tests_soln_plot'
 %run_folder='../Tests_CSC_2'
 
-RunNum = 31;
+RunNum = 1;
 %med_index=[2,9,4,4];
 
 D = 10;
@@ -119,7 +120,7 @@ for algo = 1:length(Algorithms)
                                     population = X;
                                     %objvals = Obj_vals_DDMOPP(Run).c;
                                     if plot_init == 1
-                                       population = Initial_Population_DDMOPP(Run+1).c;
+                                       population = Initial_Population_DDMOPP.Initial_Population_DDMOPP(Run+1).c;
                                     end
                                    obj_vals = zeros(size(population,1),M);
                                    for samp = 1:size(population,1)
@@ -130,7 +131,7 @@ for algo = 1:length(Algorithms)
                                    if plot_init == 0
                                        X = population;                                     
                                    else
-                                       X = Initial_Population_DDMOPP(Run+1).c;
+                                       X = Initial_Population_DDMOPP.Initial_Population_DDMOPP(Run+1).c;
                                    end
 
                                 else
@@ -148,6 +149,9 @@ for algo = 1:length(Algorithms)
                                     obj_vals = P_objective_v0('value',Problem,M,population);
                                                             
                                 end
+                            elseif strcmp(management,'0')==1
+                                population = Initial_Population_DDMOPP.Initial_Population_DDMOPP(Run-1).c;
+                                X=population
                             else
                                filename_obj=strcat(folder,'/','Run_', num2str(Run-1),'_surrx_all');
                                filename_pop=strcat(folder,'/', 'Run_', num2str(Run-1),'_popx_all');
@@ -168,7 +172,7 @@ for algo = 1:length(Algorithms)
                             end
                                if plot_progress == 1
                                    if strcmp(management,'0')==1 
-                                        population = Initial_Population_DDMOPP(Run-1).c;
+                                        population = Initial_Population_DDMOPP.Initial_Population_DDMOPP(Run-1).c;
                                         axis([-1,1,-1,1]);
                                         box on;
                                         axis square;
@@ -219,7 +223,24 @@ for algo = 1:length(Algorithms)
                                     c = linspace(1,10,length(X));
                                     length(X)
                                     figure;
-                                    scatter(X(:,1),X(:,2),sz,c,'filled');
+                                    if strcmp(management,'0')==1 
+                                        %%%%%%%%%%%%% change here to plot
+                                        %%%%%%%%%%%%% the instance and init
+                                        %%%%%%%%%%%%% together
+                                        %plot_dbmopp_2D_regions(problem_parameters,0,M,0, ...
+                                        %                        0);
+                                                            
+                                        
+                                        box on;
+                                        set(gca,'xTick',[]);
+                                        set(gca,'yTick',[]);
+                                        xlabel('');
+                                        ylabel('');hold on;
+                                        
+                                        scatter(X(:,1),X(:,2),sz,'yellow','filled');
+                                    else
+                                        scatter(X(:,1),X(:,2),sz,c,'filled');
+                                    end
                                     hold on;
                                     %scatter(
                                     if nvars > 2
@@ -257,7 +278,7 @@ for algo = 1:length(Algorithms)
                                    dlmwrite(filename_solns,obj_vals_surr);
                                    filename_solns = strcat(folder,'/','Run_', num2str(Run),'_pop_all');
                                    dlmwrite(filename_solns,population);
-                               else
+                               elseif write_final_solns == 1
                                    filename_solns = strcat(folder,'/','Run_', num2str(Run),'_soln');
                                    dlmwrite(filename_solns,obj_vals);
                                    filename_solns = strcat(folder,'/','Run_', num2str(Run),'_surr');
@@ -278,6 +299,8 @@ for algo = 1:length(Algorithms)
 
                 end
             end
+            close all;
         end
     end
 end
+close all;

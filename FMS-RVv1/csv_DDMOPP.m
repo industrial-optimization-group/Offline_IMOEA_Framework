@@ -20,18 +20,21 @@ Problems = {'P1','P2'};
 Algorithms = {'RVEA'}; %'IBEA'
 %Algorithms = {'IBEA'}; %'IBEA'
 Mobj=[2,3,4,5,6,8,10]; %,5];
-%Mobj = [3,4,5,8];
+%Mobj = [4,5,6];
 num_vars = [10]; %,8,10];
-managements = {'1','7','8'}; %,'Offline_m5_ibea','Offline_ei2_ibea'}; %'Offline_m3','Offline_m5','Offline_m6','Offline_m3_ei','Offline_m3_ei2'}; %,'Offline_m3','Offline_m4'}; %'Offline_m2','Offline_m1','Offline_m3'}; %,
+%managements = {'100','700','800'}; %,'Offline_m5_ibea','Offline_ei2_ibea'}; %'Offline_m3','Offline_m5','Offline_m6','Offline_m3_ei','Offline_m3_ei2'}; %,'Offline_m3','Offline_m4'}; %'Offline_m2','Offline_m1','Offline_m3'}; %,
+%managements = {'7000','8000'};
 %managements = {'1','7','8','12','72'};
-%managements = {'723','823'};
-%managements = {'12','72','82'}
+managements = {'1','7','8'}
+%managements = {'84','74'};
+%managements = {'1','7','8','12','72','82'}
 %managements = {'1','7','8','12','72'}%,'9'}
-%managements = {'0'}
+%managements = {'800'}
 Strategies = {'LHS','MVNORM'};
 %Strategies = {'LHS'};
 %Strategies = {'MVNORM'}
 init_folder='~/Work/Codes/Offline_IMOEA_Framework/AM_Samples_109_Final/';
+%main_folder='~/Work/Codes/Tests_CSC_R2_Finalx';
 main_folder='~/Work/Codes/Tests_Probabilistic_Rev2';
 %main_folder='Tests_CSC_4'
 %main_folder = 'Tests_additional_obj1'
@@ -56,7 +59,18 @@ for m = 1:length(Mobj)
                     management = managements{mgmt};
                     folder=fullfile(main_folder,['Offline_Mode_' management '_' algorithm],Strategy,[Problem '_' num2str(M) '_' num2str(nvars)])
                     for Runx = 1:RunNum
-                       Run=Runx-1
+                       if RunNum==1
+                                filename = fullfile(folder,['med_indices.csv']) 
+                                med_index_new=csvread(filename)
+                                %Run=med_index(mgmt)+1;
+                                Run = med_index_new(1,1)+1;
+                       else
+                           Run=Runx-1
+                       
+                       end
+                            %Run=Run-1
+                            Run
+                       %Run=Runx-1
                        
                        filename_obj=strcat(folder,'/','Run_', num2str(Run),'_obj');
                        filename_pop=strcat(folder,'/', 'Run_', num2str(Run),'_pop');
@@ -101,7 +115,7 @@ for m = 1:length(Mobj)
                                 scatter(X(:,1),X(:,2));
                                 %scatter(
                                 non = P_sort(obj_vals,'first')==1;
-                                non
+                                %non
                                 non_dom_pop = X(non,:);
                                 PF=obj_vals(non,:);
                                 scatter(non_dom_pop(:,1), non_dom_pop(:,2),'*')
@@ -109,7 +123,7 @@ for m = 1:length(Mobj)
                            end
                            if write_initsamples == 1
                             non = P_sort(obj_vals,'first')==1;
-                            non
+                            %non
                             non_dom_pop = X(non,:);
                             PF=obj_vals(non,:);                               
                            end

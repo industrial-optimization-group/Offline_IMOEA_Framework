@@ -43,14 +43,16 @@ problem_testbench = 'DDMOPP'
 
 #main_directory = 'Offline_Prob_DDMOPP3'
 main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
+#main_directory = '/home/amrzr/Work/Codes/Tests_CSC_R2_Finalx'
+
 #main_directory = 'Tests_CSC_4'
 #main_directory = 'Tests_new_adapt'
 #main_directory = 'Tests_toys'
 
-#objectives = [3]
+objectives = [,5,6]
 #objectives = [3,5,6]
 #objectives = [2,3,5,8]
-objectives = [2,3,4,5,6,8,10]
+#objectives = [2,3,4,5,6,8,10]
 
 #problems = ['DTLZ7']
 #problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
@@ -61,7 +63,7 @@ problems = ['P1','P2']
 
 #modes = [1, 2, 3]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2, 7 = Approach_Prob
 #modes = [0,7,70,71]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2
-#modes = [0,1,7,8]
+#modes = [1,7,8,12,72,82]
 #modes = [0,1,7,8]
 #modes = [0,1,9,7,8]
 #modes = [0,12,72,82]
@@ -69,16 +71,20 @@ problems = ['P1','P2']
 #modes = [0,9,1,7,8,12,723,823]
 #modes = [0,9,1,7,8]
 #modes = [0,9,12,72,82]
-modes = [0,9,1,7,8,12,72,82]
+#modes=[1,7,72]
+modes = [0,1,7,8,100,700,800]
+
+#modes = [0,9,1,7,8,12,72,82]
+
 #modes = [0,9,1,7,8,12,72,82,1296,7296,1294,7294,1295,7295,7297,72101]
 #modes = [0,9,1,7,8,12,72,82,12102,72102,82102]
 mode_length = int(np.size(modes))
 #sampling = ['BETA', 'MVNORM']
-#sampling = ['LHS']
+sampling = ['LHS']
 #sampling = ['BETA','OPTRAND','MVNORM']
 #sampling = ['OPTRAND']
 #sampling = ['MVNORM']
-sampling = ['LHS', 'MVNORM']
+#sampling = ['LHS', 'MVNORM']
 
 #emo_algorithm = ['RVEA','IBEA']
 emo_algorithm = ['RVEA']
@@ -101,7 +107,10 @@ emo_algorithm = ['RVEA']
 #approaches = ['Init','MOEA/D','ProbMOEA/D','HybMOEA/D']
 #approaches = ['Init','GenRVEA','TL','ProbRVEA','HybRVEA','MOEA/D','ProbMOEA/D','HybMOEA/D']
 #approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA']
-approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Gen-MOEA/D','Prob-MOEA/D','Hyb-MOEA/D']
+#approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Gen-MOEA/D','Prob-MOEA/D','Hyb-MOEA/D']
+approaches = ['Init','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Gen-old-RVEA','Prob-old-RVEA','Hyb-old-RVEA']
+#approaches = ['Gen-RVEA','Prob-RVEA','Hyb-RVEA','Gen-MOEA/D','Prob-MOEA/D','Hyb-MOEA/D']
+#approaches = ['Init','Prob-RVEA','Prob-MOEA/D']
 #approaches = ['Init','TL','Gen-MOEA/D','Prob-MOEA/D','Hyb-MOEA/D']
 #approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Gen-MOEA/D','Prob-MOEA/D']
 #approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Hyb-MOEA/D','Gen-MOEA/D','Prob-MOEA/D','Hyb-MOEA/D','Gen-MOEA/D-theta10','Prob-MOEA/D-theta10','Gen-MOEA/D-theta20','Prob-MOEA/D-theta20','Gen-MOEA/D-theta50','Prob-MOEA/D-theta50','Prob-MOEA/D-thetavar10','Prob-MOEA/D-thetavar20']
@@ -115,7 +124,7 @@ hv_ref = {"DTLZ2": {"2": [3, 3], "3": [3, 3, 3], "5": [3, 3, 3, 3, 3], "8": [3, 
           "DTLZ7": {"2": [1, 20], "3": [1, 1, 30], "5": [1, 1, 1, 1, 45], "8": [1, 1, 1, 1, 1, 1, 1, 90]}}
 
 
-nruns = 31
+nruns = 11
 pool_size = 3
 
 plot_boxplot = True
@@ -237,7 +246,7 @@ for samp in sampling:
                                     dx=distance.euclidean(r0,r1)
                                     ref=np.ones(obj)*dx
                                     #ref = [2]*obj
-
+                                
                                 else:
                                     if mode == 9:
                                         path_to_file = path_to_file + '/Run_' + str(run+1) + '_soln'
@@ -247,17 +256,21 @@ for samp in sampling:
                                             for line in reader: actual_objectives_nds.append(line)
                                         actual_objectives_nds = np.array(actual_objectives_nds, dtype=np.float32)
                                     else:
-                                        path_to_file = path_to_file + '/Run_' + str(run) + '_NDS'
+                                        #path_to_file = path_to_file + '/Run_' + str(run) + '_NDS'
+                                        path_to_file = path_to_file + '/Run_' + str(run) + '_soln_pickle'
                                         infile = open(path_to_file, 'rb')
                                         results_data = pickle.load(infile)
                                         infile.close()
-                                        actual_objectives_nds = results_data["actual_objectives_nds"]
+                                        #actual_objectives_nds = results_data["actual_objectives_nds"]
+                                        actual_objectives_nds = results_data["obj_solns"]
+                                        actual_objectives_nds = np.array(actual_objectives_nds, dtype=np.float32)
                                         #non_dom_surr = results_data["surrogate_objectives_nds"]
 
                                     ref = hv_ref[prob][str(obj)]
 
-                                #print(actual_objectives_nds)
-                                if np.shape(actual_objectives_nds)[0] > 1:
+                                print(np.shape(actual_objectives_nds))
+
+                                if np.shape(actual_objectives_nds)[0] > 1  :
                                     non_dom_front = ndx(actual_objectives_nds)
                                     actual_objectives_nds = actual_objectives_nds[non_dom_front[0][0]]
                                 else:
@@ -293,7 +306,7 @@ for samp in sampling:
                             #zz = np.amax(non_dom_front,axis=0)
                             #return zz
 
-                        temp = Parallel(n_jobs=11)(delayed(parallel_execute)(run, path_to_file) for run in range(nruns))
+                        temp = Parallel(n_jobs=pool_size)(delayed(parallel_execute)(run, path_to_file) for run in range(nruns))
                         #temp=None
                         #for run in range(nruns):
                         #    temp=np.append(temp,parallel_execute(run, path_to_file))
@@ -313,7 +326,7 @@ for samp in sampling:
                     solution_ratio_all = np.transpose(solution_ratio_all)
                     #print(np.max(igd_all))
                     #print(np.max(solution_ratio_all))
-                    #print(igd_all)
+                    print(igd_all)
                     #mod = MultiComparison(igd_all[:,0], igd_all[:,1], igd_all[:,2], igd_all[:,3])
                     #dat=igd_all.flatten()
                     #mod = MultiComparison(data=dat, groups=labels)
@@ -339,8 +352,8 @@ for samp in sampling:
                                                                  is_sorted=False, returnsorted=False)
                             count_prev = count
                     p_cor = p_cor_temp
-                    print(p_value)
-                    print(p_cor)
+                    #print(p_value)
+                    #print(p_cor)
                     if mod_p_val is False:
                         r, p_cor, alps, alpb = multipletests(p_value, alpha=0.05, method='bonferroni', is_sorted=False,
                                                              returnsorted=False)

@@ -18,12 +18,13 @@ problem_testbench = 'DDMOPP'
 
 #main_directory = 'Offline_Prob_DDMOPP3'
 main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
+#main_directory = '/home/amrzr/Work/Codes/Tests_CSC_R2_Finalx'
 #main_directory = 'Tests_CSC_4'
 #main_directory = 'Tests_additional_obj1'
 #main_directory = 'Tests_new_adapt'
 #main_directory = 'Tests_toys'
 
-#objectives = [3]
+#objectives = [4,5,6]
 #objectives = [3,4,5,8]
 objectives = [2,3,4,5,6,8,10]
 
@@ -34,11 +35,14 @@ problems = ['P1','P2']
 #problems = ['WELDED_BEAM'] #dims=4
 #problems = ['TRUSS2D'] #dims=3
 
-modes = [1, 7, 8]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2, 7 = Approach_Prob
-#modes = [82]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2
+#modes = [100, 700, 800]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2, 7 = Approach_Prob
+#modes = [8]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2
 #modes = [823,723]
 #modes = [12,72,82]
+#modes = [100,700,800]
+#modes = [84,74]
 #modes = [1,7,8,12,72,82]
+modes = [1,7,8]
 
 #sampling = ['BETA', 'MVNORM']
 #sampling = ['LHS']
@@ -57,7 +61,7 @@ emo_algorithm = ['RVEA']
 #############################################
 
 nruns = 31
-pool_size = nruns
+pool_size = 3
 
 
 def f(name, num_of_objectives_real, num_of_variables, x):
@@ -98,6 +102,7 @@ def parallel_execute(run, path_to_file, prob, obj):
     results_dict = {
         'obj_solns': x
     }
+    print(x)
     path_to_file2 = path_to_file + '/Run_' + str(run) + '_soln_pickle'
     outfile = open(path_to_file2, 'wb')
     pickle.dump(results_dict, outfile)
@@ -116,7 +121,7 @@ for samp in sampling:
                                        '/' + samp + '/' + prob + '_' + str(obj) + '_' + str(n_vars)
                         print(path_to_file)
 
-                        Parallel(n_jobs=pool_size)(
-                            delayed(parallel_execute)(run, path_to_file, prob, obj) for run in range(nruns))
-                        #for run in range(nruns):
-                        #    parallel_execute(run, path_to_file, prob, obj)
+                        #Parallel(n_jobs=pool_size)(
+                        #    delayed(parallel_execute)(run, path_to_file, prob, obj) for run in range(nruns))
+                        for run in range(nruns):
+                            parallel_execute(run, path_to_file, prob, obj)

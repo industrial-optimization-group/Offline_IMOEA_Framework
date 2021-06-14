@@ -11,8 +11,8 @@ rc('text', usetex=True)
 plt.rcParams.update({'font.size': 15})
 #sns.set(font_scale=1.2)
 
-testbench = "DDMOPP"
-#testbench = "DTLZ"
+#testbench = "DDMOPP"
+testbench = "DTLZ"
 comparison = 'HV'
 #comparison = 'RMSE'
 summary = []

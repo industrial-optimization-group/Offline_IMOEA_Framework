@@ -22,8 +22,6 @@ from statsmodels.stats.multitest import multipletests
 from scipy.stats import wilcoxon
 import math
 from ranking_approaches import calc_rank
-from pymop.problems.welded_beam import WeldedBeam
-from pymop.problems.truss2d import Truss2D
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 from matplotlib import rc
@@ -46,16 +44,16 @@ folder_data = 'AM_Samples_109_Final'
 problem_testbench = 'DDMOPP'
 
 # main_directory = 'Offline_Prob_DDMOPP3'
-main_directory = 'Tests_Probabilistic_Finalx_new'
+main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
 # main_directory = 'Tests_new_adapt'
 # main_directory = 'Tests_toys'
 
-#objectives = [5]
+#objectives = [2,3]
 # objectives = [3,5,6]
 #objectives = [2,3,5,8]
 objectives = [2, 3, 4, 5, 6, 8, 10]
 
-#problems = ['DTLZ4']
+#problems = ['DTLZ7']
 #problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 problems = ['P1', 'P2']
 #problems = ['P1']
@@ -76,8 +74,8 @@ mode_length = int(np.size(modes))
 # sampling = ['OPTRAND']
 #sampling = ['MVNORM']
 sampling = ['LHS', 'MVNORM']
-sx='MVNS'
-#sx='LHS'
+#sx='MVNS'
+sx='LHS'
 # emo_algorithm = ['RVEA','IBEA']
 emo_algorithm = ['RVEA']
 # emo_algorithm = ['IBEA']
@@ -97,11 +95,11 @@ emo_algorithm = ['RVEA']
 #approaches = ['Gen','TL','Prob','Hyb','GenMOEAD','ProbMOEAD','HybMOEA/D']
 approaches = ['TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Gen-MOEA/D','Prob-MOEA/D','Hyb-MOEA/D']
 
-nruns = 11
+nruns = 31
 f_eval_limit = 40000
 f_evals_per = 2000
 f_iters = 20
-pool_size = nruns
+pool_size = 4
 
 plot_boxplot = True
 
@@ -206,25 +204,38 @@ for samp in sampling:
                             surr_all = []
                             pop_all = []
                             print("Reading...")
-                            path_to_file1 = path_to_file + '/Run_' + str(run + 1) + '_soln_all'
+                            if mode == 9 or problem_testbench == "DDMOPP":
+                                path_to_file1 = path_to_file + '/Run_' + str(run+1) + '_soln_all'
+                            else:
+                                path_to_file1 = path_to_file + '/Run_' + str(run) + '_soln_all'
                             with open(path_to_file1, 'r') as f:
                                 reader = csv.reader(f)
                                 for line in reader: soln_all.append(line)
-                            path_to_file1 = path_to_file + '/Run_' + str(run + 1) + '_surr_all'
-                            with open(path_to_file1, 'r') as f:
-                                reader = csv.reader(f)
-                                for line in reader: surr_all.append(line)
-                            path_to_file1 = path_to_file + '/Run_' + str(run + 1) + '_pop_all'
-                            with open(path_to_file1, 'r') as f:
-                                reader = csv.reader(f)
-                                for line in reader: pop_all.append(line)
+                            if mode == 9 or problem_testbench == "DDMOPP":
+                                path_to_file1 = path_to_file + '/Run_' + str(run + 1) + '_surr_all'
+                                with open(path_to_file1, 'r') as f:
+                                    reader = csv.reader(f)
+                                    for line in reader: surr_all.append(line)
+                            else:
+                                path_to_filex = path_to_file + '/Run_' + str(run)
+                                infile = open(path_to_filex, 'rb')
+                                results_data = pickle.load(infile)
+                                infile.close()
+                                surr_all = results_data["objectives_archive"]
+                                if type(surr_all) is dict:
+                                    surr_all=np.vstack(surr_all.values()) 
+                            
+                            #path_to_file1 = path_to_file + '/Run_' + str(run + 1) + '_pop_all'
+                            #with open(path_to_file1, 'r') as f:
+                            #    reader = csv.reader(f)
+                            #    for line in reader: pop_all.append(line)
                             soln_all = np.array(soln_all, dtype=np.float32)
                             surr_all = np.array(surr_all, dtype=np.float32)
-                            pop_all = np.array(pop_all, dtype=np.float32)
+                            #pop_all = np.array(pop_all, dtype=np.float32)
 
                             print(np.shape(soln_all))
                             print(np.shape(surr_all))
-                            print(np.shape(pop_all))
+                            #print(np.shape(pop_all))
                             print("..........")
                             """
                             else:
@@ -307,4 +318,5 @@ for samp in sampling:
                     else:
                         fig.savefig(filename_fig + '.pdf', bbox_inches='tight')
                     ax.clear()
+                    plt.clf()
 

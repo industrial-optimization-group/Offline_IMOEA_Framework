@@ -18,16 +18,16 @@ main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
 # main_directory = 'Tests_toys'
 
 # objectives = [3,5]
-#objectives = [2, 3, 5]
-objectives = [2,3,4,5,6,8,10]
+objectives = [2, 3, 5, 8]
+#objectives = [2,3,4,5,6,8,10]
 #objectives = [10]
 
-problem_testbench = 'DDMOPP'
-#problem_testbench = 'DTLZ'
+#problem_testbench = 'DDMOPP'
+problem_testbench = 'DTLZ'
 
 # problems = ['DTLZ2']
-#problems = ['DTLZ2', 'DTLZ4', 'DTLZ5', 'DTLZ6', 'DTLZ7']
-problems = ['P1','P2']
+problems = ['DTLZ2', 'DTLZ4', 'DTLZ5', 'DTLZ6', 'DTLZ7']
+#problems = ['P1','P2']
 # problems = ['DDMOPP_P1']
 # problems = ['WELDED_BEAM'] #dims=4
 # problems = ['TRUSS2D'] #dims=3
@@ -52,7 +52,7 @@ emo_algorithm = ['RVEA']
 #############################################
 
 nruns = 31
-pool_size = nruns
+pool_size = 4
 
 
 def f(name, num_of_objectives_real, num_of_variables, x):
