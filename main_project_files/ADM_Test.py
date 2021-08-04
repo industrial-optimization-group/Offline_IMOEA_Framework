@@ -43,7 +43,7 @@ K = 10
 n_vars = K + n_objs - 1  # number of variables
 
 
-num_gen_per_iter = [2]  # number of generations per iteration
+num_gen_per_iter = [5]  # number of generations per iteration
 
 
 

@@ -137,9 +137,22 @@ class Prob_APD_select_v3(SelectionBase):
         float
             The partial penalty value
         """
+        
+        if self.time_penalty_function() < 0:
+            px = 0
+        elif self.time_penalty_function() > 1:
+            px = 1
+        else:
+            px= self.time_penalty_function()
+        penalty = ((px) ** self.alpha) * self.n_of_objectives
+
+        return penalty
+        """
         penalty = ((self.time_penalty_function()) ** self.alpha) * self.n_of_objectives
         if penalty < 0:
             penalty = 0
         if penalty > 1:
             penalty = 1
         return penalty
+        """
+

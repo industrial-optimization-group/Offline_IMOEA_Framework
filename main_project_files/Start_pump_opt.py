@@ -22,16 +22,16 @@ import GPy
 from BIOMA_framework_worst import interactive_optimize
 import copy
 
-max_iters = 5
+max_iters = 50
 gen_per_iter=10
 nobjs = 3 
 nvars = 22
 #main_directory = 'Pump_Test_Tomas_2_140'
-main_directory = 'Pump_Test_Tomas_3_140_all'
+main_directory = 'Pump_Test_Tomas_5_140_all'
 data_folder = '/home/amrzr/Work/Codes/data'
 #data_file = data_folder+'/pump_data/01_DOE_data.csv'
-#data_file = data_folder+'/pump_data/02_DOE_140_data.csv'
-data_file = data_folder+'/pump_data/03_DOE_140_all_data.csv'
+data_file = data_folder+'/pump_data/02_DOE_140_data.csv'
+#data_file = data_folder+'/pump_data/03_DOE_140_all_data.csv'
 path = data_folder + '/test_runs/' + main_directory
 
 df = pd.read_csv(data_file)

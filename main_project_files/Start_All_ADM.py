@@ -5,7 +5,7 @@ from AMD_data_evaluate import evaluate_population
 import os
 from joblib import Parallel, delayed
 import datetime
-
+import traceback
 
 data_folder = '/home/amrzr/Work/Codes/data'
 #main_directory = 'Offline_Prob_DDMOPP3'
@@ -161,7 +161,7 @@ def parallel_execute(run, algo, prob, n_vars, obj, samp, sample_size):
                 except Exception as e:
                     print(e)
                     with open(data_folder + '/test_runs/'+main_directory+"/log_"+log_time+".txt", "a") as text_file:
-                        text_file.write("\n"+ str(e) + "______" + str(datetime.datetime.now()))   
+                        text_file.write("\n"+ str(e) + "______" + traceback.format_exc()+ "________" + str(datetime.datetime.now()))   
                                 
             else:
                 with open(data_folder + '/test_runs/'+main_directory+"/log_"+log_time+".txt", "a") as text_file:

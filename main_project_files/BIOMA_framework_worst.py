@@ -62,8 +62,8 @@ def compute_nadir(population):
 
 
 def interactive_optimize(problem, gen_per_iter, max_iter, path):
-    evolver_opt = ProbRVEA_1(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
-    #evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+    #evolver_opt = ProbRVEA_1(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+    evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
     plot, pref = evolver_opt.requests()   
     pref_last = None
     ideal = None
