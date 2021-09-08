@@ -7,6 +7,7 @@ import pickle_to_mat_converter as pickmat
 import os
 from joblib import Parallel, delayed
 import datetime
+import traceback
 
 convert_to_mat = False
 #convert_to_mat = False
@@ -126,7 +127,7 @@ for samp in sampling:
                         #   tgm.send(msg='Finished Testing: \n' + path_to_file)
                         except Exception as e:
                         #    tgm.send(msg='Error occurred : \n' + path_to_file + '\n' + str(e))
-                            print(e)        
+                            print(str(e) + "______" + traceback.format_exc())        
                         #for run in range(nruns):
                         #    parallel_execute(run, path_to_file)
 #tgm.send(msg='All tests completed successfully')

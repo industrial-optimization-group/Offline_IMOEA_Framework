@@ -30,10 +30,11 @@ pareto_front_directory = 'True_Pareto_5000'
 dims = [10]
 mod_p_val = True
 
-problem_testbench = 'DTLZ'
-#problem_testbench = 'DDMOPP'
+#problem_testbench = 'DTLZ'
+problem_testbench = 'DDMOPP'
 
-main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
+#main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
+main_directory = '/home/amrzr/Work/Codes/data/test_runs/Tests_R3_Monte_Final'
 #main_directory = '/home/amrzr/Work/Codes/Tests_CSC_R2_Finalx'
 #main_directory = 'Tests_additional_obj1'
 #main_directory = 'O_Nautilus_Runs'
@@ -41,16 +42,16 @@ main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
 #main_directory = 'Tests_new_adapt'
 #main_directory = 'Tests_toys'
 
-#objectives = [3,5]
-objectives = [2,3,5,8]
+objectives = [3,5,10]
+#objectives = [2,3,5,8]
 #objectives = [8]
 #objectives = [2,3,4,5,6,8,10]
 
 #problems = ['DTLZ5']
-problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
+#problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 #problems = ['DDMOPP_P1']
 #problems = ['P1','P2']
-#problems = ['P2']
+problems = ['P1']
 #problems = ['WELDED_BEAM'] #dims=4
 #problems = ['TRUSS2D'] #dims=3
 
@@ -58,7 +59,8 @@ problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 #modes = [7]  # 1 = Generic, 2 = Approach 1 , 3 = Approach 2
 #modes = [1,2]
 #modes = [1,9,7,8,72]
-modes = [9,1,7,8,12,72,82]
+#modes = [9,1,7,8,12,72,82]
+modes = [7250, 72100, 721000, 7210000]
 #modes = [9,1,7,8,12,72,82]
 #modes = [9,1,7,8]
 
@@ -68,8 +70,8 @@ modes = [9,1,7,8,12,72,82]
 #sampling = ['BETA','OPTRAND','MVNORM']
 #sampling = ['OPTRAND']
 #sampling = ['MVNORM']
-sampling = ['LHS','MVNORM']
-#sampling = ['LHS']
+#sampling = ['LHS','MVNORM']
+sampling = ['LHS']
 
 #emo_algorithm = ['RVEA','IBEA']
 emo_algorithm = ['RVEA']
@@ -84,7 +86,8 @@ emo_algorithm = ['RVEA']
 #approaches = ['Generic', 'TransferL','Probabilistic','Hybrid']
 #approaches = ['GenRVEA','TL','ProbRVEA','HybRVEA','ProbMOEA/D']
 #approaches = ['GenRVEA','ProbRVEA','HybRVEA','MOEA/D','ProbMOEA/D','HybMOEA/D']
-approaches = ['TL','GenRVEA','ProbRVEA','HybRVEA','GenMOEA/D','ProbMOEA/D','HybMOEA/D']
+#approaches = ['TL','GenRVEA','ProbRVEA','HybRVEA','GenMOEA/D','ProbMOEA/D','HybMOEA/D']
+approaches = ['PBI-50','PBI-100','PBI-1000','PBI-10000']
 #approaches = ['TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA']
 
 
@@ -266,7 +269,7 @@ for samp in sampling:
                         obj_samp = approaches
 
                     #bp = ax.boxplot(mean_rmse_cv_all, showfliers=False)
-                    bp = ax.boxplot(mean_rmse_cv_all, showfliers=False, widths=0.45)
+                    bp = ax.boxplot(mean_rmse_cv_all, showfliers=True, widths=0.45)
                     if rmsemvr is False:
                         ax.set_title('RMSE_Solutions_' + prob + '_' + str(obj))
                         ax.set_xlabel('Objectives')
@@ -274,7 +277,6 @@ for samp in sampling:
                         ax.set_xticklabels(obj_samp, rotation=45, fontsize=8)
                         filename_fig = main_directory + '/RMSE_' + samp + '_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars) + '.png'
                         fig.savefig(filename_fig, bbox_inches='tight')
-                        ax.clear()
                     else:
                         ax.set_title('RMSE_MVR_Solutions_' + prob + '_' + str(obj))
                         ax.set_title('RMSE comparison')
@@ -284,8 +286,8 @@ for samp in sampling:
                         ax.set_xticklabels(approaches, rotation=25)
                         filename_fig = main_directory + '/RMSE_MVR_' + samp + '_' + algo + '_' + prob + '_' + str(obj) + '_' + str(n_vars) + '.pdf'
                         fig.savefig(filename_fig, bbox_inches='tight')
-                        ax.clear()
-
+                    ax.clear()
+                    plt.clf()
                     p_value =  np.zeros(int(math.factorial(mode_length)/((math.factorial(mode_length-2))*2)))
                     print(p_value)
                     p_cor_temp = p_value

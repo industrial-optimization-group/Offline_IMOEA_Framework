@@ -13,26 +13,27 @@ dims = [10]
 # dims = 4
 ############################################
 folder_data = 'AM_Samples_109_Final'
-problem_testbench = 'DTLZ'
-#problem_testbench = 'DDMOPP'
+#problem_testbench = 'DTLZ'
+problem_testbench = 'DDMOPP'
 
 #main_directory = 'Offline_Prob_DDMOPP3'
-main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
+#main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
+main_directory = '/home/amrzr/Work/Codes/data/test_runs/Tests_R3_Monte_Final'
 #main_directory = '/home/amrzr/Work/Codes/Tests_CSC_R2_Finalx'
 #main_directory = 'Tests_additional_obj1'
 #main_directory = 'Tests_new_adapt'
 #main_directory = 'Tests_toys'
 #main_directory = 'Tests_CSC_4'
 
-#objectives = [4,5,6]
-objectives = [2,3,5,8]
+objectives = [3,5,10]
+#objectives = [2,3,5,8]
 #objectives = [2,3,4,5,6,8,10]
 
 #problems = ['DTLZ4']
 #problems = ['DTLZ2','DTLZ5','DTLZ6','DTLZ7']
-problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
+#problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 #problems = ['P1','P2']
-#problems = ['P1']
+problems = ['P1']
 #problems = ['WELDED_BEAM'] #dims=4
 #problems = ['TRUSS2D'] #dims=3
 
@@ -43,14 +44,15 @@ problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 #modes = [12102,72102,82102]
 #modes = [1, 7, 8, 12, 72, 82]
 #modes = [12, 72, 82]
-modes = [800]
+#modes = [800]
+modes = [7205]
 
 #sampling = ['BETA', 'MVNORM']
-#sampling = ['LHS']
+sampling = ['LHS']
 #sampling = ['BETA','OPTRAND','MVNORM']
 #sampling = ['OPTRAND']
 #sampling = ['MVNORM']
-sampling = ['LHS', 'MVNORM']
+#sampling = ['LHS', 'MVNORM']
 
 #emo_algorithm = ['RVEA','IBEA']
 emo_algorithm = ['RVEA']
@@ -63,7 +65,7 @@ emo_algorithm = ['RVEA']
 
 #############################################
 
-nruns = 11
+nruns = 31
 pool_size = 4
 
 

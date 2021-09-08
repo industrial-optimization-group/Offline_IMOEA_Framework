@@ -38,25 +38,26 @@ save_fig = 'pdf'
 dims = [10]
 
 folder_data = 'AM_Samples_109_Final'
-problem_testbench = 'DTLZ'
-#problem_testbench = 'DDMOPP'
+#problem_testbench = 'DTLZ'
+problem_testbench = 'DDMOPP'
 
 #main_directory = 'Offline_Prob_DDMOPP3'
 #main_directory = 'Tests_Probabilistic_Finalx_new'
-main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
+#main_directory = '/home/amrzr/Work/Codes/Tests_Probabilistic_Rev2'
+main_directory = '/home/amrzr/Work/Codes/data/test_runs/Tests_R3_Monte_Final'
 #main_directory = 'Tests_CSC_4'
 #main_directory = 'Tests_new_adapt'
 #main_directory = 'Tests_toys'
 
+objectives = [3,5,10]
 #objectives = [4,5,6]
-#objectives = [4,5,6]
-objectives = [2,3,5,8]
+#objectives = [2,3,5,8]
 #objectives = [2,3,4,5,6,8,10]
 
 #problems = ['DTLZ7']
-problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
+#problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 #problems = ['P1','P2']
-#problems = ['P1']
+problems = ['P1']
 #problems = ['WELDED_BEAM'] #dims=4
 #problems = ['TRUSS2D'] #dims=3
 
@@ -67,7 +68,8 @@ problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 #modes = [0,1,9,7,8]
 #modes = [0,12,72,82]
 #modes = [0,1,9,7,8,12,72,82]
-modes = [0,9,1,7,8,12,72,82]
+#modes = [0,9,1,7,8,12,72,82]
+modes = [7250, 72100, 721000, 7210000]
 
 #modes=[100,1,700,7,800,8]
 #modes = [0,1,7,8,711,811]
@@ -79,11 +81,11 @@ modes = [0,9,1,7,8,12,72,82]
 #modes = [7,700,7334,74]
 mode_length = int(np.size(modes))
 #sampling = ['BETA', 'MVNORM']
-#sampling = ['LHS']
+sampling = ['LHS']
 #sampling = ['BETA','OPTRAND','MVNORM']
 #sampling = ['OPTRAND']
 #sampling = ['MVNORM']
-sampling = ['LHS', 'MVNORM']
+#sampling = ['LHS', 'MVNORM']
 
 #emo_algorithm = ['RVEA','IBEA']
 emo_algorithm = ['RVEA']
@@ -108,7 +110,8 @@ emo_algorithm = ['RVEA']
 
 #approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Gen-MOEA/D','Prob-MOEA/D','Hyb-MOEA/D']
 
-approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Hyb-old']
+#approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Hyb-old']
+approaches = ['PBI-50','PBI-100','PBI-1000','PBI-10000']
 #approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA']
 #approaches = ['Init','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Gen-old-RVEA','Prob-old-RVEA','Hyb-old-RVEA']
 #approaches = ['Init','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Prob-newx-RVEA','Hyb-newx-RVEA']
@@ -130,7 +133,7 @@ hv_ref = {"DTLZ2": {"2": [3, 3], "3": [3, 3, 3], "5": [3, 3, 3, 3, 3], "8": [3, 
           "DTLZ7": {"2": [1, 20], "3": [1, 1, 30], "5": [1, 1, 1, 1, 50], "8": [1, 1, 1, 1, 1, 1, 1, 90]}}
 
 
-nruns = 11
+nruns = 31
 pool_size = 4
 
 plot_boxplot = True

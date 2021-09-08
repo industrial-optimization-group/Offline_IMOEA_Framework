@@ -6,7 +6,7 @@ from desdeo_problem.Problem import DataProblem
 from desdeo_problem.surrogatemodels.SurrogateModels import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import Matern
 from desdeo_emo.EAs.OfflineRVEA import ProbRVEAv3
-
+import os
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
 from pyDOE import lhs
 import plotly.graph_objects as go
@@ -25,7 +25,9 @@ import time
 import GPy
 from BIOMA_framework import interactive_optimize
 #from ADM_Run import 
+import pickle
 
+save_model=True
 max_samples = 50
 max_iters = 5
 gen_per_iter=100
@@ -84,8 +86,19 @@ def build_surrogates(problem_name, nobjs, nvars, nsamples, is_data, x_data, y_da
 
 def run_optimizer(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, is_data, approach, run, path):
     if is_data is True:
-        x, y = read_dataset(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, run)
-        surrogate_problem = build_surrogates(problem_name, nobjs, nvars, nsamples, is_data, x, y, approach, problem_testbench)   
+        path_to_model = path+'_model'
+        if os.path.exists(path_to_model) is False:
+            x, y = read_dataset(problem_testbench, problem_name, nobjs, nvars, sampling, nsamples, run)
+            surrogate_problem = build_surrogates(problem_name, nobjs, nvars, nsamples, is_data, x, y, approach, problem_testbench)
+            if save_model is True:  
+                outfile = open(path_to_model, 'wb')
+                pickle.dump(surrogate_problem, outfile)
+                outfile.close()  
+        else:
+            print("Using saved models...")
+            infile = open(path_to_model, 'rb')
+            surrogate_problem=pickle.load(infile)
+            infile.close()  
     if approach == "interactive_uncertainty_new":
         population = run_optimizer_approach_interactive_new(surrogate_problem, path)
     elif approach == "adm_tests":

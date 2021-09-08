@@ -434,7 +434,7 @@ def uncertainty_interaction(evolver_opt, pref, path):
                             max=unc_avg_all_max,
                             ideal=evolver_opt.population.ideal_fitness_val,
                             nadir=evolver_opt.population.nadir_fitness_val,path=path)
-
+        """
         plt_int3.plot_vals(objs=obj_arch_pref,
                             unc=unc_arch_pref,
                             preference=pref,
@@ -444,7 +444,7 @@ def uncertainty_interaction(evolver_opt, pref, path):
                             max=unc_avg_all_max,
                             ideal=evolver_opt.population.ideal_fitness_val,
                             nadir=evolver_opt.population.nadir_fitness_val,path=path)
-
+        """
 
         plt_int2.plot_vals(objs=obj_arch,
                             unc=unc_arch,
@@ -456,6 +456,7 @@ def uncertainty_interaction(evolver_opt, pref, path):
                             ideal=evolver_opt.population.ideal_fitness_val,
                             nadir=evolver_opt.population.nadir_fitness_val,path=path)
         
+        """
         plt_int3.plot_vals(objs=obj_arch,
                     unc=unc_arch,
                     preference=pref,
@@ -465,7 +466,7 @@ def uncertainty_interaction(evolver_opt, pref, path):
                     max=unc_avg_all_max,
                     ideal=evolver_opt.population.ideal_fitness_val,
                     nadir=evolver_opt.population.nadir_fitness_val,path=path)
-
+        """
 
         
 
@@ -554,6 +555,7 @@ def uncertainty_interaction(evolver_opt, pref, path):
                                 ideal=evolver_opt.population.ideal_fitness_val,
                                 nadir=evolver_opt.population.nadir_fitness_val,
                                 path=path)
+            """
             plt_int3.plot_vals(objs=obj_arch[loc],
                     unc=unc_arch[loc],
                     preference=pref,
@@ -564,6 +566,7 @@ def uncertainty_interaction(evolver_opt, pref, path):
                     ideal=evolver_opt.population.ideal_fitness_val,
                     nadir=evolver_opt.population.nadir_fitness_val,
                     path=path)
+            """
             """
             fig_obj = plt_int.animate_parallel_coords_next_(data=obj_arch[loc],
                                                     data_unc=unc_arch[loc],

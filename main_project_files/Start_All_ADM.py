@@ -17,7 +17,8 @@ data_folder = '/home/amrzr/Work/Codes/data'
 #main_directory = 'Test_Gpy3'
 #main_directory = 'Test_DR_4'  #DR = Datatset Reduction
 #main_directory = 'Test_DR_Scratch'
-main_directory = 'Test_Interactive_2'
+#main_directory = 'Test_Interactive_2'
+main_directory = 'Test_Interactive_new1'
 #main_directory = 'Test_RF'
 #main_directory = 'Test_DR_CSC_Final_1'
 init_folder = data_folder + '/initial_samples_109'
@@ -57,8 +58,8 @@ objs(10) = PFPF;
 
 
 
-#objectives = [5]
-objectives = [5,7,9]
+objectives = [5,9]
+#objectives = [5,7,9]
 #objectives = [3, 5, 7]
 #objectives = [3,5,7]
 #objectives = [2,3,5]
@@ -66,15 +67,17 @@ objectives = [5,7,9]
 #objectives = [3,5,6,8,10]
 #objectives = [3,5,6,8,10]
 
-problem_testbench = 'DTLZ'
-#problem_testbench = 'DDMOPP'
+#problem_testbench = 'DTLZ'
+problem_testbench = 'DDMOPP'
 #problem_testbench = 'GAA'
 
 #problems = ['DTLZ4']
-problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
+#problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 
+problems = ['P1']
 #problems = ['P1','P5']
 #problems = ['P1','P2','P3','P4','P5']
+#problems = ['P2','P3','P4','P5']
 #problems = ['P1','P3','P4']
 
 
@@ -107,8 +110,8 @@ approaches_string = '_'.join(approaches)
 #sampling = ['LHS']
 #sampling = ['BETA','OPTRAND','MVNORM']
 #sampling = ['OPTRAND']
-#sampling = ['MVNORM']
-sampling = ['LHS', 'MVNORM']
+sampling = ['MVNORM']
+#sampling = ['LHS', 'MVNORM']
 
 #emo_algorithm = ['RVEA','IBEA']
 emo_algorithm = ['RVEA']
@@ -161,7 +164,7 @@ def parallel_execute(run, algo, prob, n_vars, obj, samp, sample_size):
                 except Exception as e:
                     print(e)
                     with open(data_folder + '/test_runs/'+main_directory+"/log_"+log_time+".txt", "a") as text_file:
-                        text_file.write("\n"+ str(e) + "______" + traceback.format_exc()+ "________" + str(datetime.datetime.now()))   
+                        text_file.write("\n"+path_to_file+"___"+str(run)+ "-Error-"+str(e) + "______" + traceback.format_exc()+ "________" + str(datetime.datetime.now()))   
                                 
             else:
                 with open(data_folder + '/test_runs/'+main_directory+"/log_"+log_time+".txt", "a") as text_file:
