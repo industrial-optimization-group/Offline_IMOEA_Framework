@@ -316,7 +316,7 @@ for samp in sampling:
                             #zz = np.amax(non_dom_front,axis=0)
                             #return zz
 
-                        temp = Parallel(n_jobs=11)(delayed(parallel_execute)(run, path_to_file) for run in range(nruns))
+                        temp = Parallel(n_jobs=pool_size)(delayed(parallel_execute)(run, path_to_file) for run in range(nruns))
                         #temp=None
                         #for run in range(nruns):
                         #    temp=np.append(temp,parallel_execute(run, path_to_file))

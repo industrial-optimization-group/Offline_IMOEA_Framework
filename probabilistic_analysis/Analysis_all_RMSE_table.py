@@ -213,6 +213,8 @@ for samp in sampling:
                                     #surrogate_objectives_nds = surr_obj[non_dom_front[0][0]]
                                     actual_objectives_nds = actual_obj
                                     surrogate_objectives_nds = surr_obj
+                                    print(np.shape(actual_objectives_nds))
+                                    print(np.shape(surrogate_objectives_nds))
 
                             if rmsemvr is False:
                                 for i in range(obj):
@@ -232,7 +234,7 @@ for samp in sampling:
                                 return rmse_sols
 
 
-                        rmse_temp = Parallel(n_jobs=11)(delayed(parallel_execute)(run, path_to_file) for run in range(nruns))
+                        rmse_temp = Parallel(n_jobs=pool_size)(delayed(parallel_execute)(run, path_to_file) for run in range(nruns))
                         rmse_temp = np.asarray(rmse_temp)
                         #mean_r_sq_cv_temp = temp[:][:, 0]
                         #mean_rmse_cv_temp = temp[:][:, 0]
@@ -258,7 +260,7 @@ for samp in sampling:
                     mode_length = mode_size
                     obj_samp = []
                     if rmsemvr is False:
-                        mean_rmse_cv_all_temp = np.zeros((11, obj*mode_size))
+                        mean_rmse_cv_all_temp = np.zeros((nruns, obj*mode_size))
                         for i in range(obj):
                             for j in range(mode_size):
                                 mean_rmse_cv_all_temp[:, count] = mean_rmse_cv_all[:, i+j*obj]
