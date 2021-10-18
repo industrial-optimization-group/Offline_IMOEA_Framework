@@ -20,7 +20,7 @@ class PolynomialRegressionsurrogate(BaseRegressor):
         if isinstance(y, (pd.DataFrame, pd.Series)):
             y = y.values.squeeze()
 
-        self.m = make_pipeline(PolynomialFeatures(degree=2), Ridge(alpha=1e-3))
+        self.m = make_pipeline(PolynomialFeatures(degree=3), Ridge(alpha=1e-3))
         self.m.fit(X,y)
 
     def predict(self, X):

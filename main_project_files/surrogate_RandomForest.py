@@ -22,7 +22,7 @@ class RandomForest(BaseRegressor):
         #if y.ndim == 1:
         #    y = y.reshape(1, -1)
 
-        self.m = RandomForestRegressor(max_depth=2, random_state=0)
+        self.m = RandomForestRegressor(n_estimators=500)
         self.m.fit(X,y)
 
     def predict(self, X):
