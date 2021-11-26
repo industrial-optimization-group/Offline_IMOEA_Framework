@@ -3,7 +3,9 @@ from desdeo_problem.Problem import DataProblem
 from desdeo_problem.surrogatemodels.SurrogateModels import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import Matern
 from desdeo_emo.EAs.OfflineRVEA import ProbRVEAv3
-from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv3 as ProbRVEA_1
+from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv3
+from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv1
+from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv1_pump
 from desdeo_emo.EAs.OfflineRVEA import RVEA
 
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
@@ -33,7 +35,7 @@ def build_models(x, y):
 
 def interactive_optimize_test(problem, path):
     #evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=10)
-    evolver_opt = ProbRVEA_1(problem, use_surrogates=True, interact=True, n_gen_per_iter=10)
+    evolver_opt = ProbRVEAv1(problem, use_surrogates=True, interact=True, n_gen_per_iter=10)
     plot, pref = evolver_opt.requests()   
     pref_last = None 
     while evolver_opt.continue_evolution():
@@ -61,9 +63,17 @@ def compute_nadir(population):
     return max_gen
 
 
-def interactive_optimize(problem, gen_per_iter, max_iter, path):
-    #evolver_opt = ProbRVEA_1(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
-    evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+def full_optimize(problem, classification_model, gen_per_iter, max_iter, path):
+    evolver_opt = ProbRVEAv1_pump(classification_model=classification_model, problem=problem, use_surrogates=True, interact=False, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+    while evolver_opt.continue_evolution():
+        evolver_opt.iterate()
+        print("Population size:",np.shape(evolver_opt.population.objectives)[0])
+    return evolver_opt
+
+
+def interactive_optimize(problem, classification_model, gen_per_iter, max_iter, path):
+    evolver_opt = ProbRVEAv1_pump(classification_model=classification_model, problem=problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+    #evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
     plot, pref = evolver_opt.requests()   
     pref_last = None
     ideal = None

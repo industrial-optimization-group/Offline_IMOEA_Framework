@@ -10,7 +10,7 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 
-class Prob_APD_select_v1(SelectionBase):
+class Prob_APD_select_v1_pump(SelectionBase):
     """The selection operator for the RVEA algorithm. Read the following paper for more
         details.
         R. Cheng, Y. Jin, M. Olhofer and B. Sendhoff, A Reference Vector Guided
@@ -27,13 +27,14 @@ class Prob_APD_select_v1(SelectionBase):
     """
 
     def __init__(
-        self, pop: Population, time_penalty_function: Callable, alpha: float = 2
+        self, pop: Population, classification_probability, time_penalty_function: Callable, alpha: float = 2
     ):
         self.time_penalty_function = time_penalty_function
         self.alpha = alpha
         self.n_of_objectives = pop.problem.n_of_objectives
+        #self.classification_probability = classification_probability
 
-    def do(self, pop: Population, vectors: ReferenceVectors) -> List[int]:
+    def do(self, pop: Population, vectors: ReferenceVectors, classification_probability) -> List[int]:
 
 
         #def Prob_APD_select_v3(
@@ -45,6 +46,8 @@ class Prob_APD_select_v1(SelectionBase):
         #):
         fitness = pop.fitness
         uncertainty = pop.uncertainity
+        print("Pop size:",fitness.shape)
+        print("Class prob size:",classification_probability.shape)
         penalty_factor = self._partial_penalty_factor()
         refV = vectors.neighbouring_angles_current
         fmin = np.amin(fitness, axis=0)
@@ -86,6 +89,7 @@ class Prob_APD_select_v1(SelectionBase):
                 np.squeeze(np.where(assigned_vectors == i))
             )
             sub_population_fitness = pwrong.f_samples[sub_population_index]
+            sub_pop_class_prob = classification_probability[sub_population_index]
             #print(len(sub_population_fitness))
 
             if len(sub_population_fitness > 0):
@@ -108,25 +112,31 @@ class Prob_APD_select_v1(SelectionBase):
                 # Using mean APD
                 #rank_apd = np.mean(apd, axis=2)
 
+                # MC Probability computation
+                rank_apd = pwrong.compute_rank_MC(apd)
+                #print("Prob APD only:",rank_apd)
+                rank_apd = rank_apd * (1-sub_pop_class_prob)
+                #print("Prob APD mod:",rank_apd)
 
                 # Actual probability computation with ECDF
+                """
                 pwrong.pdf_list = {}
                 pwrong.ecdf_list = {}
                 pwrong.compute_pdf(apd)
-                pwrong.plt_density(apd)
+                #pwrong.plt_density(apd)
                 pwrong.compute_rank_vectorized2()
                 rank_apd = pwrong.rank_prob_wrong
                 apd_elites = apd[0,np.where(rank_apd[0,:]<0),:]
                 if np.size(apd_elites) >= 1:
                     rank_apd = np.mean(apd_elites, axis=2)
-
+                """
 
                 minidx = np.where(rank_apd[0] == np.nanmin(rank_apd[0]))
                 #print("Id :",minidx)
                 if np.isnan(apd).all():
                     continue
                 selx = sub_population_index[minidx]
-                print("Selection:",selx)
+                #print("Selection:",selx)
                 #print("Selection2:",sub_population_index[minidx[0][0]])
                 if selection.shape[0] == 0:
                     selection = np.hstack((selection, np.transpose(selx[0])))

@@ -11,6 +11,7 @@ import pandas as pd
 from main_project_files.surrogate_fullGP import FullGPRegressor as fgp
 from desdeo_problem.surrogatemodels.SurrogateModels import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import Matern
+from sklearn.ensemble import RandomForestClassifier
 
 #from pygmo import non_dominated_front_2d as nd2
 from non_domx import ndx
@@ -20,14 +21,17 @@ import time
 import GPy
 #from BIOMA_framework import interactive_optimize
 from BIOMA_framework_worst import interactive_optimize
+from BIOMA_framework_worst import full_optimize
 import copy
 
-max_iters = 50
-gen_per_iter=10
+max_iters = 5 #50
+gen_per_iter= 10 #10
 nobjs = 3 
 nvars = 22
+is_interact = False
+
 #main_directory = 'Pump_Test_Tomas_2_140'
-main_directory = 'Pump_Test_Tomas_5_140_all'
+main_directory = 'Pump_test_140_probclass_1'
 data_folder = '/home/amrzr/Work/Codes/data'
 #data_file = data_folder+'/pump_data/01_DOE_data.csv'
 data_file = data_folder+'/pump_data/02_DOE_140_data.csv'
@@ -46,10 +50,40 @@ x_high = np.ones(22)
 x_low_new = np.ones(22)*0
 x_high_new = np.ones(22)
 
+def build_classification_failed():
+    main_directory = 'Pump_Test_Tomas_6_177'
+    data_folder = '/home/amrzr/Work/Codes/data'
+    #data_file = data_folder+'/pump_data/sim_stat2.csv'
+    data_file = data_folder+'/pump_data/03_DOE_180_failed.csv'
+    df = pd.read_csv(data_file)   
+    X=df.values[:,0:22]
+    y=df.values[:,22]
 
-def run_optimizer_approach_interactive(problem, path):
+    labels = list(set(y.flatten()))
+    models = {}
+    for label in labels:
+        ytmp=y.copy()
+        ytmp[ytmp!=label]=0
+        ytmp[ytmp==label]=1
+        
+        m=GPy.models.GPClassification(X, ytmp[:, None])
+        
+        m.optimize_restarts(messages=True, robust=True, 
+                            num_restarts=5)
+        #    else:
+        #        m.optimize(messages=True)
+        models[label]=m
+    return models[1]
+
+
+def run_optimizer_approach_interactive(problem, classification_model, path):
     print("Optimizing...")
-    evolver_opt = interactive_optimize(problem, gen_per_iter, max_iters, path)
+    evolver_opt = interactive_optimize(problem, classification_model, gen_per_iter, max_iters, path)
+    return evolver_opt.population
+
+def run_optimizer_approach_full(problem, classification_model, path):
+    print("Optimizing...")
+    evolver_opt = full_optimize(problem, classification_model, gen_per_iter, max_iters, path)
     return evolver_opt.population
 
 def scale_data(data):
@@ -59,6 +93,7 @@ def scale_data(data):
     return data
 
 def build_surrogates(nobjs, nvars, df): #x_data, y_data):
+    print("Building surrogates...")
     x_names = list(df.columns)[0:22]
     y_names = list(df.columns)[22:25]
     row_names = ['lower_bound','upper_bound']
@@ -87,10 +122,14 @@ data_scaled = scale_data(df)
 #x_low = np.min(zz,axis=0)
 
 surrogate_problem = build_surrogates(nobjs, nvars, data_scaled)
+classification_model = build_classification_failed()
 #print(surrogate_problem.objectives[2]._model.predict(np.asarray(data_scaled.loc[0:1,:'x22'])))
 #print(surrogate_problem.objectives[2]._model.predict(np.asarray(x_low_new).reshape(1,-1)))
 #print(surrogate_problem.objectives[2]._model.predict(zz))
-population = run_optimizer_approach_interactive(surrogate_problem, path)
+if is_interact:
+    population = run_optimizer_approach_interactive(surrogate_problem, classification_model, path)
+else:
+    population = run_optimizer_approach_full(surrogate_problem, classification_model, path)
 
 results_dict = {
         'individual_archive': population.individuals_archive,

@@ -460,3 +460,30 @@ class Probability_wrong:
         for i in range(self.size_rows):
             for j in range(self.size_cols):
                 self.ecdf_list
+
+    def compute_probability_wrong_MC(self, samples_A, samples_B):
+        # Compute P_{wrong}(A>B)
+        a_final=np.tile(samples_A,(self.n_samples,1))
+        b_final=np.transpose(np.tile(samples_B,(self.n_samples,1)))
+        return(np.sum(a_final>b_final)/(self.n_samples**2))
+
+    def compute_rank_MC(self, apd):
+        #dim1 = self.size_rows
+        #dim2 = self.size_cols
+        dim1 = np.shape(apd)[0]
+        dim2 = np.shape(apd)[1]
+        self.rank_prob_wrong = np.zeros((dim1,dim2))
+        for i in range(dim1):
+            for j in range(dim2):
+                temp_rank = 0
+                for k in range(dim2):
+                #    print(i)
+                #    print(j)
+                #    print(k)
+                    temp_rank += self.compute_probability_wrong_MC(
+                                                            apd[i][j],
+                                                            apd[i][k])
+                    #print("Temp Rank:",temp_rank)
+                self.rank_prob_wrong[i, j] = temp_rank - 0.5
+        #print("Probabilities:", self.rank_prob_wrong)
+        return self.rank_prob_wrong
