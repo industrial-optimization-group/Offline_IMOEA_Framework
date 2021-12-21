@@ -2,7 +2,7 @@ import sys
 sys.path.insert(1, '/home/amrzr/Work/Codes/Offline_IMOEA_Framework/')
 
 from desdeo_problem.Problem import DataProblem
-
+import pickle
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
@@ -31,12 +31,25 @@ nvars = 22
 is_interact = False
 
 #main_directory = 'Pump_Test_Tomas_2_140'
-main_directory = 'Pump_test_140_probclass_1'
+#main_directory = 'Pump_test_140_prob_1'  #180 samples
+#main_directory = 'Pump_test_All_probclass_1'   # all samples including test runs
+main_directory = 'Pump_test_All_probclass_2'   # all samples including test runs (new constraint handling /changed transpose in prob class)
+#main_directory = 'Pump_test_All_probclass_3'   # all samples including test runs (changed transpose in prob class)
+#main_directory = 'Pump_test_01_03_04_prob_1' # all DOE data
+#main_directory = 'Pump_test_04_DOE_probclass_1'  # 487 samples
+#main_directory = 'Pump_test_140_probclass_2'
+
 data_folder = '/home/amrzr/Work/Codes/data'
 #data_file = data_folder+'/pump_data/01_DOE_data.csv'
-data_file = data_folder+'/pump_data/02_DOE_140_data.csv'
+#data_file = data_folder+'/pump_data/02_DOE_140_data.csv'
+#data_file = data_folder+'/pump_data/04_DOE_successful.csv'
+#data_file = data_folder+'/pump_data/DOE_01_03_04_successful.csv'
+data_file = data_folder+'/pump_data/DataSets_successful.csv'
 #data_file = data_folder+'/pump_data/03_DOE_140_all_data.csv'
 path = data_folder + '/test_runs/' + main_directory
+
+model_file = 'Dataset_140'
+read_saved_models = False
 
 df = pd.read_csv(data_file)
 df[['f1','f2','f3']] = df[['f1','f2','f3']]*-1
@@ -54,7 +67,10 @@ def build_classification_failed():
     main_directory = 'Pump_Test_Tomas_6_177'
     data_folder = '/home/amrzr/Work/Codes/data'
     #data_file = data_folder+'/pump_data/sim_stat2.csv'
-    data_file = data_folder+'/pump_data/03_DOE_180_failed.csv'
+    #data_file = data_folder+'/pump_data/03_DOE_180_failed.csv'
+    #data_file = data_folder+'/pump_data/04_DOE_table_all.csv'
+    #data_file = data_folder+'/pump_data/DOE_01_03_04_all.csv'
+    data_file = data_folder+'/pump_data/DataSets_all.csv'
     df = pd.read_csv(data_file)   
     X=df.values[:,0:22]
     y=df.values[:,22]
@@ -69,7 +85,8 @@ def build_classification_failed():
         m=GPy.models.GPClassification(X, ytmp[:, None])
         
         m.optimize_restarts(messages=True, robust=True, 
-                            num_restarts=5)
+                            num_restarts=1
+                            )
         #    else:
         #        m.optimize(messages=True)
         models[label]=m
@@ -121,6 +138,15 @@ data_scaled = scale_data(df)
 #zz[0,0]=zz[0,0]+0.01
 #x_low = np.min(zz,axis=0)
 
+
+if read_saved_models:
+    data_file = data_folder+ '/test_runs/Pump_models/' + model_file
+    infile = open(data_file, 'rb')
+    results_data = pickle.load(infile)
+    infile.close()
+    individuals = results_data["individuals_solutions"]
+    surrogate_objectives = results_data["obj_solutions"]
+
 surrogate_problem = build_surrogates(nobjs, nvars, data_scaled)
 classification_model = build_classification_failed()
 #print(surrogate_problem.objectives[2]._model.predict(np.asarray(data_scaled.loc[0:1,:'x22'])))
@@ -141,6 +167,18 @@ results_dict = {
     }
 outfile = open(path+'/run_pump', 'wb')
 pickle.dump(results_dict, outfile)
+outfile.close()
+
+surrogate_problem_copy = copy.deepcopy(surrogate_problem)
+#classification_model_copy = copy.deepcopy(classification_model)
+models_dict = {
+        'surrogate_problem': surrogate_problem_copy
+        #'classification_model': classification_model_copy           
+    }
+
+path = data_folder + '/test_runs/Pump_models'
+outfile = open(path+'/' + model_file, 'wb')
+pickle.dump(models_dict, outfile)
 outfile.close()
 
 

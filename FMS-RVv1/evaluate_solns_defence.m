@@ -36,7 +36,7 @@ sample_size = 109;
 %managements = {'1','7','8','12','72','82'};
 %managements = {'12','72','82'};
 %managements = {'1','7'}
-managements = {'7'}
+managements = {'1'}
 
 %Strategies = {'LHS','MVNORM'};
 %Strategies = {'LHS'};
@@ -125,7 +125,7 @@ for algo = 1:length(Algorithms)
                                    obj_vals = zeros(size(population,1),M);
                                    for samp = 1:size(population,1)
                                         obj_vals(samp,:) = distance_points_problem(population(samp,:),problem_parameters);        
-                                        %obj_vals
+                                        
                                    end
                                    %obj_vals
                                    if plot_init == 0
@@ -165,7 +165,9 @@ for algo = 1:length(Algorithms)
                                        for samp = 1:size(population,1)
                                             obj_vals(samp,:) = distance_points_problem(population(samp,:),problem_parameters);        
                                             %obj_vals
+                                            
                                        end
+                                       obj_valsx = obj_vals;
                                else
                                    obj_vals = P_objective_v0('value',Problem,M,population);
                                end
@@ -241,7 +243,7 @@ for algo = 1:length(Algorithms)
                                         
                                         scatter(X(:,1),X(:,2),sz,'yellow','filled');
                                     else
-                                        for gen_i = 1:length(X)-39000
+                                        for gen_i = 1:length(X)-39017
                                             if mod(gen_i-1,100) == 0
                                                 figure;
                                                 %axis([-1,1,-1,1]);
@@ -253,16 +255,23 @@ for algo = 1:length(Algorithms)
                                                 xlabel('');
                                                 ylabel('');hold on;
                                                 scatter(X(gen_i:gen_i+100,1),X(gen_i:gen_i+100,2),sz,c(gen_i:gen_i+100,:),'filled');
+                                                if gen_i >910
+                                                    non = P_sort(obj_valsx(gen_i:gen_i+100,:),'first')==1;
+                                                    non_dom_pop = X(gen_i+non:gen_i+100+non,:);
+                                                    PF=obj_valsx(non,:);
+                                                    scatter(non_dom_pop(:,1), non_dom_pop(:,2),'+','red','linewidth',2)
+                                                end
                                                 %colormap(gca,'viridis')
                                                 axis square;
                                                 set(gca,'xtick',[],'ytick',[]);
                                                 set(gcf, 'PaperSize', [5 5])
-                                                saveas(gcf,strcat(run_folder,'/ProgProj_',num2str(gen_i),'_',algorithm,'_',Strategy,'_',Problem,'_',num2str(M),'_',num2str(nvars),'_',management),'pdf');
+                                                saveas(gcf,strcat(run_folder,'/',num2str((gen_i-1)/100)),'pdf');
                                                 %scatter(X(:,1),X(:,2),sz,c,'filled');
+                                                
                                             end
                                         end
                                         %scatter(X(:,1),X(:,2),sz,c,'filled');
-                                        
+
                                     end
                                     hold on;
                                     %scatter(
