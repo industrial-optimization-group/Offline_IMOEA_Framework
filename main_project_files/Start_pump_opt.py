@@ -14,7 +14,7 @@ from sklearn.gaussian_process.kernels import Matern
 from sklearn.ensemble import RandomForestClassifier
 
 #from pygmo import non_dominated_front_2d as nd2
-from non_domx import ndx
+from other_tools.non_domx import ndx
 import scipy.io
 from sklearn.neighbors import NearestNeighbors
 import time

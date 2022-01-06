@@ -14,10 +14,10 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from non_domx import ndx
-import plot_interactive as plt_int2
-import plot3d_confidence_v2 as plt_int3
-import plot_reference_vectors as plt_refv
+from other_tools.non_domx import ndx
+import plotting_tools.plot_interactive as plt_int2
+import plotting_tools.plot3d_confidence as plt_int3
+import plotting_tools.plot_reference_vectors as plt_refv
 
 
 """
