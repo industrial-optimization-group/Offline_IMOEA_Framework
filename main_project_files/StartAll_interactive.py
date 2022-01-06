@@ -3,7 +3,7 @@
 
 import main_execute_interactive as mexe
 import pickle
-import pickle_to_mat_converter as pickmat
+import other_tools.pickle_to_mat_converter as pickmat
 import os
 from joblib import Parallel, delayed
 import datetime

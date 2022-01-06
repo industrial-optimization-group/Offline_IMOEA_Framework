@@ -14,11 +14,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from main_project_files.surrogate_fullGP import FullGPRegressor as fgp
-from main_project_files.surrogate_sparseGP import SparseGPRegressor as sgp
-from main_project_files.surrogate_sparseGP_2 import SparseGPRegressor as sgp2
+#from main_project_files.surrogate_sparseGP import SparseGPRegressor as sgp
+#from main_project_files.surrogate_sparseGP_2 import SparseGPRegressor as sgp2
 from desdeo_emo.EAs.OfflineRVEA import RVEA
 #from pygmo import non_dominated_front_2d as nd2
-from non_domx import ndx
+from other_tools.non_domx import ndx
 import scipy.io
 from sklearn.neighbors import NearestNeighbors
 import time
