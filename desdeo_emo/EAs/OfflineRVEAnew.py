@@ -8,7 +8,9 @@ from desdeo_emo.selection.APD_Select_constraints import APD_Select
 from desdeo_emo.selection.Prob_APD_Select_v1 import Prob_APD_select_v1  # orginal 
 #from desdeo_emo.selection.Prob_APD_Select_v2 import Prob_APD_Select_v2  # faster by computational tricks
 from desdeo_emo.selection.Prob_APD_Select_v3 import Prob_APD_select_v3  # superfast y considering mean APD
-from desdeo_emo.selection.Prob_APD_Select_v1_pump import Prob_APD_select_v1_pump
+from desdeo_emo.selection.Prob_APD_Select_v0_pump import Prob_APD_select_v0_pump # prob using MC samples (no classification)
+from desdeo_emo.selection.Prob_APD_Select_v1_pump import Prob_APD_select_v1_pump # prob classification using MC samples (product of probabilities)
+from desdeo_emo.selection.Prob_APD_Select_v2_pump import Prob_APD_select_v2_pump # prob classification using MC samples (RVEA type constraint handling)
 #from desdeo_emo.selection.Prob_Hybrid_APD_Select import Prob_Hybrid_APD_Select   # hybrid approach with mean selection
 from desdeo_problem.Problem import MOProblem
 import numpy as np
@@ -505,7 +507,191 @@ class ProbRVEAv1_pump(RVEA):
             self.iteration_archive_fitness = np.vstack((self.iteration_archive_fitness, self.population.fitness))
             self.iteration_archive_uncertainty = np.vstack((self.iteration_archive_uncertainty, self.population.uncertainity))
 
+class ProbRVEAv0_pump(RVEA):
+    def __init__(
+        self,
+        classification_model,
+        problem: MOProblem,
+        population_size: int = None,
+        population_params: Dict = None,
+        initial_population: Population = None,
+        alpha: float = 2,
+        lattice_resolution: int = None,
+        a_priori: bool = False,
+        interact: bool = False,
+        use_surrogates: bool = False,
+        n_iterations: int = 10,
+        n_gen_per_iter: int = 100,
+        total_function_evaluations: int = 0,
+        time_penalty_component: Union[str, float] = None
+    ):
+        super().__init__(
+            classification_model= classification_model,
+            problem=problem,
+            population_size=population_size,
+            population_params=population_params,
+            initial_population=initial_population,
+            lattice_resolution=lattice_resolution,
+            a_priori=a_priori,
+            interact=interact,
+            use_surrogates=use_surrogates,
+            n_iterations=n_iterations,
+            n_gen_per_iter=n_gen_per_iter,
+            total_function_evaluations=total_function_evaluations
+        )
+        selection_operator = Prob_APD_select_v0_pump(
+            self.population, self.classification_probability, self.time_penalty_function, alpha
+        )
+        self.selection_operator = selection_operator
 
+    def manage_preferences(self, preference=None):
+        """Run the interruption phase of EA.
+
+        Use this phase to make changes to RVEA.params or other objects.
+        Updates Reference Vectors (adaptation), conducts interaction with the user.
+
+        """
+        if not isinstance(preference, (ReferencePointPreference, type(None))):
+            msg = (
+                f"Wrong object sent as preference. Expected type = "
+                f"{type(ReferencePointPreference)} or None\n"
+                f"Recieved type = {type(preference)}"
+            )
+            raise eaError(msg)
+        if preference is not None:
+            if preference.request_id != self._interaction_request_id:
+                msg = (
+                    f"Wrong preference object sent. Expected id = "
+                    f"{self._interaction_request_id}.\n"
+                    f"Recieved id = {preference.request_id}"
+                )
+                raise eaError(msg)
+        if preference is None and not self._ref_vectors_are_focused:
+            self.reference_vectors.adapt(self.population.fitness)
+        if preference is not None:
+            ideal = self.population.ideal_fitness_val
+            #fitness_vals = self.population.ob
+            refpoint_actual = (
+                preference.response.values * self.population.problem._max_multiplier
+            )
+            refpoint = refpoint_actual - ideal
+            norm = np.sqrt(np.sum(np.square(refpoint)))
+            refpoint = refpoint / norm
+            
+            # evaluate alpha_k
+            cos_theta_f_k = self.reference_vectors.find_cos_theta_f_k(refpoint_actual, self.population, self.objs_interation_end, self.unc_interaction_end)
+            # adapt reference vectors
+            self.reference_vectors.interactive_adapt_offline_adaptive(refpoint, cos_theta_f_k)
+            
+            #self.reference_vectors.iteractive_adapt_1(refpoint)
+            
+            self.reference_vectors.add_edge_vectors()
+            #print("Shape RV:", np.shape(self.reference_vectors.values))
+        
+        self.reference_vectors.neighbouring_angles()
+        if self.iteration_archive_objectives is None: 
+            self.iteration_archive_individuals = self.population.individuals
+            self.iteration_archive_objectives = self.population.objectives
+            self.iteration_archive_fitness = self.population.fitness
+            self.iteration_archive_uncertainty = self.population.uncertainity
+        else:
+            self.iteration_archive_individuals = np.vstack((self.iteration_archive_individuals, self.population.individuals))
+            self.iteration_archive_objectives = np.vstack((self.iteration_archive_objectives, self.population.objectives))
+            self.iteration_archive_fitness = np.vstack((self.iteration_archive_fitness, self.population.fitness))
+            self.iteration_archive_uncertainty = np.vstack((self.iteration_archive_uncertainty, self.population.uncertainity))
+
+class ProbRVEAv2_pump(RVEA):
+    def __init__(
+        self,
+        classification_model,
+        problem: MOProblem,
+        population_size: int = None,
+        population_params: Dict = None,
+        initial_population: Population = None,
+        alpha: float = 2,
+        lattice_resolution: int = None,
+        a_priori: bool = False,
+        interact: bool = False,
+        use_surrogates: bool = False,
+        n_iterations: int = 10,
+        n_gen_per_iter: int = 100,
+        total_function_evaluations: int = 0,
+        time_penalty_component: Union[str, float] = None
+    ):
+        super().__init__(
+            classification_model= classification_model,
+            problem=problem,
+            population_size=population_size,
+            population_params=population_params,
+            initial_population=initial_population,
+            lattice_resolution=lattice_resolution,
+            a_priori=a_priori,
+            interact=interact,
+            use_surrogates=use_surrogates,
+            n_iterations=n_iterations,
+            n_gen_per_iter=n_gen_per_iter,
+            total_function_evaluations=total_function_evaluations
+        )
+        selection_operator = Prob_APD_select_v2_pump(
+            self.population, self.classification_probability, self.time_penalty_function, alpha
+        )
+        self.selection_operator = selection_operator
+
+    def manage_preferences(self, preference=None):
+        """Run the interruption phase of EA.
+
+        Use this phase to make changes to RVEA.params or other objects.
+        Updates Reference Vectors (adaptation), conducts interaction with the user.
+
+        """
+        if not isinstance(preference, (ReferencePointPreference, type(None))):
+            msg = (
+                f"Wrong object sent as preference. Expected type = "
+                f"{type(ReferencePointPreference)} or None\n"
+                f"Recieved type = {type(preference)}"
+            )
+            raise eaError(msg)
+        if preference is not None:
+            if preference.request_id != self._interaction_request_id:
+                msg = (
+                    f"Wrong preference object sent. Expected id = "
+                    f"{self._interaction_request_id}.\n"
+                    f"Recieved id = {preference.request_id}"
+                )
+                raise eaError(msg)
+        if preference is None and not self._ref_vectors_are_focused:
+            self.reference_vectors.adapt(self.population.fitness)
+        if preference is not None:
+            ideal = self.population.ideal_fitness_val
+            #fitness_vals = self.population.ob
+            refpoint_actual = (
+                preference.response.values * self.population.problem._max_multiplier
+            )
+            refpoint = refpoint_actual - ideal
+            norm = np.sqrt(np.sum(np.square(refpoint)))
+            refpoint = refpoint / norm
+            
+            # evaluate alpha_k
+            cos_theta_f_k = self.reference_vectors.find_cos_theta_f_k(refpoint_actual, self.population, self.objs_interation_end, self.unc_interaction_end)
+            # adapt reference vectors
+            self.reference_vectors.interactive_adapt_offline_adaptive(refpoint, cos_theta_f_k)
+            
+            #self.reference_vectors.iteractive_adapt_1(refpoint)
+            
+            self.reference_vectors.add_edge_vectors()
+            #print("Shape RV:", np.shape(self.reference_vectors.values))
+        
+        self.reference_vectors.neighbouring_angles()
+        if self.iteration_archive_objectives is None: 
+            self.iteration_archive_individuals = self.population.individuals
+            self.iteration_archive_objectives = self.population.objectives
+            self.iteration_archive_fitness = self.population.fitness
+            self.iteration_archive_uncertainty = self.population.uncertainity
+        else:
+            self.iteration_archive_individuals = np.vstack((self.iteration_archive_individuals, self.population.individuals))
+            self.iteration_archive_objectives = np.vstack((self.iteration_archive_objectives, self.population.objectives))
+            self.iteration_archive_fitness = np.vstack((self.iteration_archive_fitness, self.population.fitness))
+            self.iteration_archive_uncertainty = np.vstack((self.iteration_archive_uncertainty, self.population.uncertainity))
 class ProbRVEAv3(RVEA):
     def __init__(
         self,
@@ -596,8 +782,6 @@ class ProbRVEAv3(RVEA):
             self.iteration_archive_objectives = np.vstack((self.iteration_archive_objectives, self.population.objectives))
             self.iteration_archive_fitness = np.vstack((self.iteration_archive_fitness, self.population.fitness))
             self.iteration_archive_uncertainty = np.vstack((self.iteration_archive_uncertainty, self.population.uncertainity))
-
-
 class HybridRVEA(RVEA):
     def __init__(
         self,

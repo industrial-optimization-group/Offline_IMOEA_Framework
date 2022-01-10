@@ -10,7 +10,7 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 
-class Prob_APD_select_v1_pump(SelectionBase):
+class Prob_APD_select_v2_pump(SelectionBase):
     """The selection operator for the RVEA algorithm. Read the following paper for more
         details.
         R. Cheng, Y. Jin, M. Olhofer and B. Sendhoff, A Reference Vector Guided
@@ -116,11 +116,21 @@ class Prob_APD_select_v1_pump(SelectionBase):
                 rank_apd = pwrong.compute_rank_MC(apd)
                 #print("Prob APD only:",rank_apd)
                 
+                # New failed samples handing same as constraint handling in RVEA
+                if len(sub_population_index) > 1:
+                    violation_values = np.transpose(sub_pop_class_prob)
+                    # True if feasible
+                    feasible_bool = (violation_values > 0.5).all(axis=1)
 
-                # Probabilisitc constraint handling (poduct of probabilities)
-                rank_apd = rank_apd * (1-np.transpose(sub_pop_class_prob)) # sub_pop_class_prob = probabilisty of being successful
-                #print("Prob APD mod:",rank_apd)
-
+                    # Case when entire subpopulation is infeasible
+                    if (feasible_bool == False).all():
+                        rank_apd = 1-sub_pop_class_prob
+                    # Case when only some are infeasible
+                    else:
+                        rank_apd = rank_apd[feasible_bool]
+                        sub_pop_class_prob = np.transpose(sub_pop_class_prob)[feasible_bool]
+                        rank_apd = rank_apd * (1-sub_pop_class_prob)
+                
 
                 minidx = np.where(rank_apd[0] == np.nanmin(rank_apd[0]))
                 #print("Id :",minidx)

@@ -10,7 +10,7 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 
-class Prob_APD_select_v1_pump(SelectionBase):
+class Prob_APD_select_v0_pump(SelectionBase):
     """The selection operator for the RVEA algorithm. Read the following paper for more
         details.
         R. Cheng, Y. Jin, M. Olhofer and B. Sendhoff, A Reference Vector Guided
@@ -115,12 +115,6 @@ class Prob_APD_select_v1_pump(SelectionBase):
                 # MC Probability computation
                 rank_apd = pwrong.compute_rank_MC(apd)
                 #print("Prob APD only:",rank_apd)
-                
-
-                # Probabilisitc constraint handling (poduct of probabilities)
-                rank_apd = rank_apd * (1-np.transpose(sub_pop_class_prob)) # sub_pop_class_prob = probabilisty of being successful
-                #print("Prob APD mod:",rank_apd)
-
 
                 minidx = np.where(rank_apd[0] == np.nanmin(rank_apd[0]))
                 #print("Id :",minidx)

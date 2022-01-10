@@ -5,7 +5,9 @@ from sklearn.gaussian_process.kernels import Matern
 from desdeo_emo.EAs.OfflineRVEA import ProbRVEAv3
 from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv3
 from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv1
+from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv0_pump
 from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv1_pump
+from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv2_pump
 from desdeo_emo.EAs.OfflineRVEA import RVEA
 
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
@@ -63,8 +65,36 @@ def compute_nadir(population):
     return max_gen
 
 
-def full_optimize(problem, classification_model, gen_per_iter, max_iter, path):
-    evolver_opt = ProbRVEAv1_pump(classification_model=classification_model, problem=problem, use_surrogates=True, interact=False, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+def full_optimize(problem, classification_model, gen_per_iter, max_iter, path, selection_type):
+    if selection_type == 'prob_only':
+        evolver_opt = ProbRVEAv0_pump(classification_model=classification_model, 
+                                    problem=problem, 
+                                    use_surrogates=True, 
+                                    interact=False, 
+                                    n_gen_per_iter=gen_per_iter, 
+                                    n_iterations=max_iter)
+    
+    elif selection_type == 'prob_class_v1':
+        evolver_opt = ProbRVEAv1_pump(classification_model=classification_model, 
+                                    problem=problem, 
+                                    use_surrogates=True, 
+                                    interact=False, 
+                                    n_gen_per_iter=gen_per_iter, 
+                                    n_iterations=max_iter)
+    elif selection_type == 'prob_class_v2':
+        evolver_opt = ProbRVEAv2_pump(classification_model=classification_model, 
+                                    problem=problem, 
+                                    use_surrogates=True, 
+                                    interact=False, 
+                                    n_gen_per_iter=gen_per_iter, 
+                                    n_iterations=max_iter)
+    else:
+        evolver_opt = RVEA(problem, 
+                        use_surrogates=True,
+                        interact=False, 
+                        n_gen_per_iter=gen_per_iter, 
+                        n_iterations=max_iter)    
+
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()
         print("Population size:",np.shape(evolver_opt.population.objectives)[0])
@@ -72,7 +102,12 @@ def full_optimize(problem, classification_model, gen_per_iter, max_iter, path):
 
 
 def interactive_optimize(problem, classification_model, gen_per_iter, max_iter, path):
-    evolver_opt = ProbRVEAv1_pump(classification_model=classification_model, problem=problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+    evolver_opt = ProbRVEAv1_pump(classification_model=classification_model, 
+                                problem=problem, 
+                                use_surrogates=True, 
+                                interact=True, 
+                                n_gen_per_iter=gen_per_iter, 
+                                n_iterations=max_iter)
     #evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
     plot, pref = evolver_opt.requests()   
     pref_last = None
