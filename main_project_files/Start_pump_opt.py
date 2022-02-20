@@ -36,9 +36,9 @@ is_interact = False
 #main_directory = 'Pump_test_All_probclass_2'   # all samples including test runs (new constraint handling /changed transpose in prob class)
 #main_directory = 'Pump_test_All_probclass_3'   # all samples including test runs (changed transpose in prob class)
 #main_directory = 'Pump_test_01_03_04_prob_1' # all DOE data
-main_directory = 'Pump_test_04_DOE_prob_only_run1'  # 487 samples
+#main_directory = 'Pump_test_04_DOE_prob_only_run1'  # 487 samples
 #main_directory = 'Pump_test_04_DOE_probclass_v1_run1'  # 487 samples
-#main_directory = 'Pump_test_04_DOE_probclass_v2_run1'  # 487 samples
+main_directory = 'Pump_test_04_DOE_probclass_v2_run2'  # 487 samples
 #main_directory = 'Pump_test_04_DOE_generic_run1'  # 487 samples
 #main_directory = 'Pump_test_140_probclass_2'
 
@@ -51,9 +51,9 @@ data_file = data_folder+'/pump_data/04_DOE_successful.csv'
 #data_file = data_folder+'/pump_data/03_DOE_140_all_data.csv'
 path = data_folder + '/test_runs/' + main_directory
 
-selection_type = 'prob_only'  # proba
-#selection_type = 'prob_class_v1'
-#selection_type = 'prob_class_v2'
+#selection_type = 'prob_only'  # prob using MC samples (no classification)
+#selection_type = 'prob_class_v1' # prob classification using MC samples (product of probabilities)
+selection_type = 'prob_class_v2' # prob classification using MC samples (RVEA type constraint handling)
 #selection_type = 'generic'
 
 model_file = 'Dataset_04_DOE'
@@ -89,11 +89,11 @@ def build_classification_failed():
         ytmp=y.copy()
         ytmp[ytmp!=label]=0
         ytmp[ytmp==label]=1
+        kernel = GPy.kern.Matern52(np.shape(X)[1], ARD=True)
+        m=GPy.models.GPClassification(X, ytmp[:, None], kernel=kernel)
         
-        m=GPy.models.GPClassification(X, ytmp[:, None])
-        
-        m.optimize_restarts(messages=True, robust=True, 
-                            num_restarts=1
+        m.optimize_restarts(messages=False, robust=True, 
+                            num_restarts=4
                             )
         #    else:
         #        m.optimize(messages=True)

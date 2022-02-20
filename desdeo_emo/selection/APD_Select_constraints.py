@@ -54,7 +54,6 @@ class APD_Select(SelectionBase):
         List[int]
             List of indices of the selected individuals
         """
-        print("Objectives:",pop.objectives)
         partial_penalty_factor = self._partial_penalty_factor()
         refV = vectors.neighbouring_angles_current
         # Normalization - There may be problems here

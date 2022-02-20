@@ -65,7 +65,7 @@ def compute_nadir(population):
     return max_gen
 
 
-def full_optimize(problem, classification_model, gen_per_iter, max_iter, path, selection_type):
+def full_optimize(problem, classification_model, gen_per_iter, max_iter, selection_type):
     if selection_type == 'prob_only':
         evolver_opt = ProbRVEAv0_pump(classification_model=classification_model, 
                                     problem=problem, 

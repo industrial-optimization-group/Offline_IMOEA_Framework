@@ -124,7 +124,10 @@ class Prob_APD_select_v2_pump(SelectionBase):
 
                     # Case when entire subpopulation is infeasible
                     if (feasible_bool == False).all():
+                        sub_pop_class_prob = np.transpose(sub_pop_class_prob)
                         rank_apd = 1-sub_pop_class_prob
+                        #sub_pop_class_prob = np.transpose(sub_pop_class_prob)[feasible_bool]
+                        #rank_apd = rank_apd * (1-sub_pop_class_prob)
                     # Case when only some are infeasible
                     else:
                         rank_apd = rank_apd[feasible_bool]
