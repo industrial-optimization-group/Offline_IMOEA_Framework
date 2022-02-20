@@ -41,8 +41,8 @@ sample_sizes = [109]
 #folder_data = 'AM_Samples_109_Final'
 #folder_data = 'AM_Samples_1000'
 
-problem_testbench = 'DTLZ'
-#problem_testbench = 'DDMOPP'
+#problem_testbench = 'DTLZ'
+problem_testbench = 'DDMOPP'
 #problem_testbench = 'GAA'
 """
 objs(1) = max_NOISE;
@@ -58,23 +58,22 @@ objs(10) = PFPF;
 """
 
 
-
+objectives = [7]
 #objectives = [3, 5, 7, 9]
-#objectives = [3,5,7]
-objectives = [5,9]
 #objectives = [5, 7, 9]
+#objectives = [3, 5, 7]
 #objectives = [3,5,7]
 #objectives = [2,3,5]
 #objectives = [2,3,4,5,6,8,10]
 #objectives = [3,5,6,8,10]
 #objectives = [3,5,6,8,10]
 
-problems = ['DTLZ4','DTLZ7']
+#problems = ['DTLZ7']
 #problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 
-#problems = ['P2']
-#problems = ['P1','P2','P3','P4']
-#problems = ['P1','P3','P4']
+problems = ['P1']
+#problems = ['P1','P2','P3','P4','P5']
+#problems = ['P1','P2']
 
 
 #problems = ['WELDED_BEAM'] #dims=4
@@ -106,8 +105,8 @@ approaches_string = '_'.join(approaches)
 #sampling = ['LHS']
 #sampling = ['BETA','OPTRAND','MVNORM']
 #sampling = ['OPTRAND']
-#sampling = ['MVNORM']
-sampling = ['LHS', 'MVNORM']
+sampling = ['MVNORM']
+#sampling = ['LHS', 'MVNORM']
 
 #emo_algorithm = ['RVEA','IBEA']
 emo_algorithm = ['RVEA']
@@ -120,13 +119,14 @@ interactive = True
 #############################################
 
 
-nruns = 5
+nruns = 22
 n_plus=12
 parallel_jobs = 64
 log_time = str(datetime.datetime.now())
 
 
 def parallel_execute(run, algo, prob, n_vars, obj, samp, sample_size):
+    
     run=run+n_plus
     path_to_file = data_folder + '/test_runs/'+  main_directory \
                 + '/Offline_Mode_' + approaches_string + '_' + algo + \
@@ -160,7 +160,7 @@ def parallel_execute(run, algo, prob, n_vars, obj, samp, sample_size):
                 except Exception as e:
                     print(e)
                     with open(data_folder + '/test_runs/'+main_directory+"/log_"+log_time+".txt", "a") as text_file:
-                        text_file.write("\n"+ str(e) + "______" + traceback.format_exc()+ "________" + str(datetime.datetime.now()))       
+                        text_file.write("\n"+ str(e) + "______" + traceback.format_exc()+ "________" + str(datetime.datetime.now()))  
             else:
                 with open(data_folder + '/test_runs/'+main_directory+"/log_"+log_time+".txt", "a") as text_file:
                     text_file.write("\n"+path_to_file+"___"+str(run)+"___File already exists!___"+str(datetime.datetime.now()))

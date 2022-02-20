@@ -53,8 +53,7 @@ class Probability_wrong:
             f_temp = None
             for j in range(self.num_objectives):
                 #sample = truncnorm.rvs(-1.96, 1.96, loc=self.mean_values[i,j], scale=self.stddev_values[i,j], size=self.n_samples)
-                sample = truncnorm.rvs(-3, 3, loc=self.mean_values[i, j], scale=self.stddev_values[i, j],
-                                       size=self.n_samples)
+                sample = truncnorm.rvs(-3, 3, loc=self.mean_values[i, j], scale=self.stddev_values[i, j], size=self.n_samples)
                 #sample = np.random.normal(self.mean_values[i,j], self.stddev_values[i,j], self.n_samples)
                 sample = np.reshape(sample, (1,1,self.n_samples))
                 if f_temp is None:

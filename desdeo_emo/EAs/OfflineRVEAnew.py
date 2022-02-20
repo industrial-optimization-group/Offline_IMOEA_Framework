@@ -263,7 +263,7 @@ class RVEA(BaseDecompositionEA):
     def _next_gen(self):
         size_pop = np.shape(self.population.objectives)[0]
         #print("Pop size before recombination: ",size_pop)
-        if self.interact is True and size_pop <= self.thresh_size:
+        if self.interact is True and size_pop <= self.thresh_size and self._gen_count_in_curr_iteration == 1:
             self.population.individuals = self.iteration_archive_individuals
             self.population.objectives = self.iteration_archive_objectives
             self.population.fitness = self.iteration_archive_fitness

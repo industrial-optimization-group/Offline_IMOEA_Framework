@@ -80,7 +80,15 @@ def generateRP4decision(base: baseADM, max_assigned_vector):
     )
     # Index of the solution which has a minimum distance to the origin
     #print("sub pop fit size:",np.shape(sub_pop_fitness_magnitude)[0])
-    minidx = np.where(sub_pop_fitness_magnitude == np.nanmin(sub_pop_fitness_magnitude))
+    try:
+        minidx = np.where(sub_pop_fitness_magnitude == np.nanmin(sub_pop_fitness_magnitude))
+    except Exception as e:
+        print('Exception:', e)
+        print("sub pop fit ma:",sub_pop_fitness_magnitude)
+        print('Assigned vectors:', assigned_vectors)
+        print('Translated cf:', translated_cf)
+        print('max ass vect:', max_assigned_vector)
+    
     distance_selected = sub_pop_fitness_magnitude[minidx]
 
     # Create the reference point

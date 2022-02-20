@@ -28,6 +28,6 @@ class FullGPRegressor(BaseRegressor):
         #y_mean, y_stdev = np.asarray(self.m.predict(X)[0]).reshape(1,-1)
         y_mean, y_stdev = np.asarray(self.m.predict(X))
         y_mean = (y_mean.reshape(1,-1))
-        y_stdev = (y_stdev.reshape(1,-1))
+        y_stdev = np.sqrt(y_stdev.reshape(1,-1))
         return (y_mean, y_stdev)
 

@@ -119,10 +119,14 @@ class Prob_APD_select_v3(SelectionBase):
                     selection = np.vstack((selection, np.transpose(selx[0])))
                     vector_selection = np.hstack((vector_selection, i))
 
-        if selection.shape[0] == 1:
-            print("Only one individual!!")
+        #if selection.shape[0] == 1:
+        #    print("Only one individual!!")
+        #    rand_select = np.random.randint(len(fitness), size=1)
+        #    selection = np.vstack((selection, np.transpose(rand_select[0])))
+        while selection.shape[0] == 1:
             rand_select = np.random.randint(len(fitness), size=1)
-            selection = np.vstack((selection, np.transpose(rand_select[0])))
+            #selection = np.vstack((selection, np.transpose(rand_select[0])))
+            selection = np.union1d(selection,np.transpose(rand_select[0]))
         #print("Selection:",selection)
         return selection.squeeze()
 
@@ -137,9 +141,20 @@ class Prob_APD_select_v3(SelectionBase):
         float
             The partial penalty value
         """
+        if self.time_penalty_function() < 0:
+            px = 0
+        elif self.time_penalty_function() > 1:
+            px = 1
+        else:
+            px= self.time_penalty_function()
+        penalty = ((px) ** self.alpha) * self.n_of_objectives
+
+        return penalty
+        """
         penalty = ((self.time_penalty_function()) ** self.alpha) * self.n_of_objectives
         if penalty < 0:
             penalty = 0
         if penalty > 1:
             penalty = 1
         return penalty
+        """

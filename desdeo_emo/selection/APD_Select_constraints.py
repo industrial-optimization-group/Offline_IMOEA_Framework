@@ -143,6 +143,9 @@ class APD_Select(SelectionBase):
                     selection = np.hstack((selection, np.transpose(selx[0])))
                 else:
                     selection = np.vstack((selection, np.transpose(selx[0])))
+        while selection.shape[0] == 1:
+            rand_select = np.random.randint(len(fitness), size=1)
+            selection = np.union1d(selection,np.transpose(rand_select[0]))
         return selection.squeeze()
 
     def _partial_penalty_factor(self) -> float:
@@ -155,12 +158,23 @@ class APD_Select(SelectionBase):
         float
             The partial penalty value
         """
+        if self.time_penalty_function() < 0:
+            px = 0
+        elif self.time_penalty_function() > 1:
+            px = 1
+        else:
+            px= self.time_penalty_function()
+        penalty = ((px) ** self.alpha) * self.n_of_objectives
+
+        return penalty
+        """
         penalty = ((self.time_penalty_function()) ** self.alpha) * self.n_of_objectives
         if penalty < 0:
             penalty = 0
         if penalty > 1:
             penalty = 1
         return penalty
+        """
 
     def _calculate_fitness(self, pop) -> np.ndarray:
         if self.selection_type == "mean":

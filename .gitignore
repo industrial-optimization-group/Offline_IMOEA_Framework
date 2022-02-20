@@ -1,0 +1,7 @@
+.vscode/settings.json
+pyproject.toml
+poetry.lock
+venv
+run_file_ddmopp.bash
+run_file_dtlz.bash
+slurm*.out
