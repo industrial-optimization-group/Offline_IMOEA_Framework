@@ -7,34 +7,44 @@ import os
 from joblib import Parallel, delayed
 import datetime
 import traceback
+import pandas as pd
 import numpy as np
 
 data_folder = '/home/amrzr/Work/Codes/data'
-results_folder = 'Test_constrained_1'
+results_folder = 'Test_constrained_2'
 init_folder = data_folder + '/constraint_handling_dataset'
-
 
 #file_exists_check = True
 file_exists_check = False
 
-evaluate_data = True
-#evaluate_data = False
+#evaluate_data = True
+evaluate_data = False
 
 
 problem_testbench = 'DTLZ'
 #problem_testbench = 'DDMOPP'
 #problem_testbench = 'GAA'
 
+file_instances = init_folder + '/test_instances.csv'
+data_instances = pd.read_csv(file_instances)
+all_problems = data_instances["problem"].values
+all_n_vars = data_instances["nvars"].values
+all_objs = data_instances["K"].values
+all_sample_size = data_instances["N"].values
+all_ndim = data_instances["ndim"].values
+all_bound_valL = data_instances["bound_valL"].values
+all_bound_valU = data_instances["bound_valU"].values
+
+"""
 all_problems = ['DTLZ2']
 #problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 #problems = ['P1']
-
 
 all_n_vars = [5]
 
 all_objs = [2]
 
-all_sampling = ['LHS']
+#all_sampling = ['LHS']
 
 all_sample_size = [250]
 
@@ -43,13 +53,9 @@ all_ndim = [5]
 all_bound_valL = [0.2]
 
 all_bound_valU = [0.9]
+"""
 
-approaches = ["genericRVEA","probRVEA","probRVEA_constraint_v1","probRVEA_constraint_v2"]
-
-
-sampling = ['LHS']
-
-
+approaches = ["genericRVEA"] #,"probRVEA","probRVEA_constraint_v1","probRVEA_constraint_v2"]
 
 size_instance = np.size(all_problems)
 
@@ -58,7 +64,7 @@ interactive = False
 #############################################
 
 
-nruns = 4
+nruns = 1
 parallel_jobs = 4
 log_time = str(datetime.datetime.now())
 
@@ -74,13 +80,13 @@ def parallel_execute(run, instance, approach):
     bound_valL = all_bound_valL[instance]
     bound_valU = all_bound_valU[instance]
 
-    problem_spec ='tests_' + prob +'_'+ str(sample_size) + '_' + str(obj) + '_' + \
+    problem_spec = prob +'_'+ str(sample_size) + '_' + str(obj) + '_' + \
                     str(n_vars) +  '_b'+str(ndim) +'_' + str(bound_valL).replace('.','') + \
                         str(bound_valU).replace('.','')
 
     path_to_file = data_folder + '/test_runs/'+  results_folder \
                 + '/' + approach + '/' + problem_spec
-    path_to_folder = path_to_file
+
     print(path_to_file)
     
     with open(data_folder + '/test_runs/'+ results_folder +"/log_"+log_time+".txt", "a") as text_file:
