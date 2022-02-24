@@ -141,6 +141,10 @@ class Prob_APD_select_v3(SelectionBase):
         float
             The partial penalty value
         """
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 5d77055adb5f5ce50cea938c21cd3d4ea97b1671
         if self.time_penalty_function() < 0:
             px = 0
         elif self.time_penalty_function() > 1:
@@ -158,3 +162,7 @@ class Prob_APD_select_v3(SelectionBase):
             penalty = 1
         return penalty
         """
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5d77055adb5f5ce50cea938c21cd3d4ea97b1671

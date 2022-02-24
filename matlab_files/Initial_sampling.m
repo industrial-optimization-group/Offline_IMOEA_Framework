@@ -8,13 +8,17 @@ Runs=35;
 Strategies={'MVNORM', 'LHS'};
 %Design='Random';
 %Design='MVNORM';
-sample_sizes = [2000, 10000, 50000];
 
-num_vars = [2, 5, 7, 10, 20]
+%sample_sizes = [2000, 10000, 50000];
+sample_sizes = [109]
+
+%num_vars = [2, 5, 7, 10, 20]
+num_vars = [10]
 %no_vars = 20
 %[~,Boundary,Coding] = P_objective('init',Problem,2,100);
 
-folder = '../data/initial_samples'
+%folder = '../data/initial_samples'
+folder = '~/Work/Codes/data/initial_samples_109'
 
 for ss = 1:length(sample_sizes)
     sample_size = sample_sizes(ss);

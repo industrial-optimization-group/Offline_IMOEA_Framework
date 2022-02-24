@@ -165,6 +165,7 @@ class APD_Select(SelectionBase):
         else:
             px= self.time_penalty_function()
         penalty = ((px) ** self.alpha) * self.n_of_objectives
+<<<<<<< HEAD
 
         return penalty
         """
@@ -173,6 +174,8 @@ class APD_Select(SelectionBase):
             penalty = 0
         if penalty > 1:
             penalty = 1
+=======
+>>>>>>> 5d77055adb5f5ce50cea938c21cd3d4ea97b1671
         return penalty
         """
 

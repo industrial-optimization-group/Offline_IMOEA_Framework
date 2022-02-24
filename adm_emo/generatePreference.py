@@ -88,7 +88,11 @@ def generateRP4decision(base: baseADM, max_assigned_vector):
         print('Assigned vectors:', assigned_vectors)
         print('Translated cf:', translated_cf)
         print('max ass vect:', max_assigned_vector)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 5d77055adb5f5ce50cea938c21cd3d4ea97b1671
     distance_selected = sub_pop_fitness_magnitude[minidx]
 
     # Create the reference point

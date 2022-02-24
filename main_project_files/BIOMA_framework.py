@@ -3,6 +3,7 @@ from desdeo_problem.Problem import DataProblem
 from desdeo_problem.surrogatemodels.SurrogateModels import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import Matern
 from desdeo_emo.EAs.OfflineRVEA import ProbRVEAv3
+from desdeo_emo.EAs.OfflineRVEAnew import ProbRVEAv3 as ProbRVEA_1
 from desdeo_emo.EAs.OfflineRVEA import RVEA
 
 from desdeo_problem.testproblems.TestProblems import test_problem_builder
@@ -11,9 +12,10 @@ import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from non_domx import ndx
-import plot_interactive as plt_int2
-import plot_reference_vectors as plt_refv
+from other_tools.non_domx import ndx
+import plotting_tools.plot_interactive as plt_int2
+import plotting_tools.plot3d_confidence as plt_int3
+import plotting_tools.plot_reference_vectors as plt_refv
 
 
 """
@@ -31,7 +33,7 @@ def build_models(x, y):
 
 def interactive_optimize_test(problem, path):
     #evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=10)
-    evolver_opt = ProbRVEAv3(problem, use_surrogates=True, interact=True, n_gen_per_iter=10)
+    evolver_opt = ProbRVEA_1(problem, use_surrogates=True, interact=True, n_gen_per_iter=10)
     plot, pref = evolver_opt.requests()   
     pref_last = None 
     while evolver_opt.continue_evolution():
@@ -60,12 +62,12 @@ def compute_nadir(population):
 
 
 def interactive_optimize(problem, gen_per_iter, max_iter, path):
-    #evolver_opt = ProbRVEAv3(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
-    evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+    evolver_opt = ProbRVEA_1(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
+    #evolver_opt = RVEA(problem, use_surrogates=True, interact=True, n_gen_per_iter=gen_per_iter, n_iterations=max_iter)
     plot, pref = evolver_opt.requests()   
     pref_last = None
     ideal = None
-    ideal_prev = np.zeros(problem.n_of_objectives)
+    ideal_prev = np.ones(problem.n_of_objectives)*-100
     nadir = None
     while evolver_opt.continue_evolution():
         print("Iteration Count:")
@@ -292,6 +294,8 @@ def uncertainty_interaction(evolver_opt, pref, path):
 
     # Convert uncertainty to indifference
     unc_arch_percent = np.abs((1.96*unc_arch/obj_arch)*100)
+    unc_arch_lower = obj_arch - 1.96*unc_arch
+    unc_arch_upper = obj_arch + 1.96*unc_arch
     min_uncertainty = np.min(unc_arch_percent, axis=0)
     max_uncertainty = np.max(unc_arch_percent, axis=0)
     thresholds = np.ones_like(evolver_opt.population.ideal_fitness_val)*np.inf
@@ -400,6 +404,17 @@ def uncertainty_interaction(evolver_opt, pref, path):
         unc_avg_all = np.mean(unc_arch_all, axis=1)
         unc_avg_all_max = np.max(unc_avg_all)
         unc_avg_all_min = np.min(unc_avg_all)
+
+        plt_int2.plot_vals(objs=obj_arch2,
+                    unc=unc_arch2,
+                    preference=pref,
+                    iteration=evolver_opt._iteration_counter,
+                    interaction_count=-3,
+                    min=unc_avg_all_min,
+                    max=unc_avg_all_max,
+                    ideal=evolver_opt.population.ideal_fitness_val,
+                    nadir=evolver_opt.population.nadir_fitness_val,path=path)
+
         plt_int2.plot_vals(objs=obj_arch_all,
                             unc=unc_arch_all,
                             preference=pref,
@@ -419,7 +434,17 @@ def uncertainty_interaction(evolver_opt, pref, path):
                             max=unc_avg_all_max,
                             ideal=evolver_opt.population.ideal_fitness_val,
                             nadir=evolver_opt.population.nadir_fitness_val,path=path)
-
+        """
+        plt_int3.plot_vals(objs=obj_arch_pref,
+                            unc=unc_arch_pref,
+                            preference=pref,
+                            iteration=evolver_opt._iteration_counter,
+                            interaction_count=-1,
+                            min=unc_avg_all_min,
+                            max=unc_avg_all_max,
+                            ideal=evolver_opt.population.ideal_fitness_val,
+                            nadir=evolver_opt.population.nadir_fitness_val,path=path)
+        """
 
         plt_int2.plot_vals(objs=obj_arch,
                             unc=unc_arch,
@@ -430,16 +455,19 @@ def uncertainty_interaction(evolver_opt, pref, path):
                             max=unc_avg_all_max,
                             ideal=evolver_opt.population.ideal_fitness_val,
                             nadir=evolver_opt.population.nadir_fitness_val,path=path)
+        
+        """
+        plt_int3.plot_vals(objs=obj_arch,
+                    unc=unc_arch,
+                    preference=pref,
+                    iteration=evolver_opt._iteration_counter,
+                    interaction_count=0,
+                    min=unc_avg_all_min,
+                    max=unc_avg_all_max,
+                    ideal=evolver_opt.population.ideal_fitness_val,
+                    nadir=evolver_opt.population.nadir_fitness_val,path=path)
+        """
 
-        plt_int2.plot_vals(objs=obj_arch2,
-                            unc=unc_arch2,
-                            preference=pref,
-                            iteration=evolver_opt._iteration_counter,
-                            interaction_count=-3,
-                            min=unc_avg_all_min,
-                            max=unc_avg_all_max,
-                            ideal=evolver_opt.population.ideal_fitness_val,
-                            nadir=evolver_opt.population.nadir_fitness_val,path=path)
         
 
 
@@ -478,6 +506,15 @@ def uncertainty_interaction(evolver_opt, pref, path):
                     delimiter=",")
         np.savetxt(path+'/Unc_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
                     + '_' + str(count_interaction_thresh) + '.csv', unc_arch[loc],
+                    delimiter=",")
+        np.savetxt(path+'/Unc_percent_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
+                    + '_' + str(count_interaction_thresh) + '.csv', unc_arch_percent[loc],
+                    delimiter=",")
+        np.savetxt(path+'/Unc_lower_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
+                    + '_' + str(count_interaction_thresh) + '.csv', unc_arch_lower[loc],
+                    delimiter=",")
+        np.savetxt(path+'/Unc_upper_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
+                    + '_' + str(count_interaction_thresh) + '.csv', unc_arch_upper[loc],
                     delimiter=",")
         np.savetxt(path+'/Indiv_arch_cutoff' + '_' + str(evolver_opt._iteration_counter)
                     + '_' + str(count_interaction_thresh) + '.csv', indiv_arch[loc],
@@ -518,6 +555,18 @@ def uncertainty_interaction(evolver_opt, pref, path):
                                 ideal=evolver_opt.population.ideal_fitness_val,
                                 nadir=evolver_opt.population.nadir_fitness_val,
                                 path=path)
+            """
+            plt_int3.plot_vals(objs=obj_arch[loc],
+                    unc=unc_arch[loc],
+                    preference=pref,
+                    iteration=evolver_opt._iteration_counter,
+                    interaction_count=count_interaction_thresh,
+                    min=unc_avg_all_min,
+                    max=unc_avg_all_max,
+                    ideal=evolver_opt.population.ideal_fitness_val,
+                    nadir=evolver_opt.population.nadir_fitness_val,
+                    path=path)
+            """
             """
             fig_obj = plt_int.animate_parallel_coords_next_(data=obj_arch[loc],
                                                     data_unc=unc_arch[loc],

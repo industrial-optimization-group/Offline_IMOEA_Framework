@@ -3,30 +3,32 @@
 
 import main_execute_interactive as mexe
 import pickle
-import pickle_to_mat_converter as pickmat
+import other_tools.pickle_to_mat_converter as pickmat
 import os
 from joblib import Parallel, delayed
 import datetime
+import traceback
 
 convert_to_mat = False
 #convert_to_mat = False
 #import Telegram_bot.telegram_bot_messenger as tgm
 #dims = [5,8,10] #,8]
-dims = [10]
-#dims = [27]
+#dims = [10]
+dims = [27]
 
-#sample_size = 2000
-sample_size = 109
+sample_size = 1000
+#sample_size = 109
 #dims = 4
 ############################################
-folder_data = 'AM_Samples_109_Final'
-#folder_data = 'AM_Samples_1000'
+#folder_data = 'AM_Samples_109_Final'
+folder_data = 'AM_Samples_1000'
 data_folder = '/home/amrzr/Work/Codes/data'
-init_folder = data_folder + '/initial_samples_old'
+#init_folder = data_folder + '/initial_samples_old'
+init_folder = data_folder + '/AM_Samples_1000'
 
-problem_testbench = 'DTLZ'
+#problem_testbench = 'DTLZ'
 #problem_testbench = 'DDMOPP'
-#problem_testbench = 'GAA'
+problem_testbench = 'GAA'
 """
 objs(1) = max_NOISE;
 objs(2) = max_WEMP;
@@ -40,33 +42,33 @@ objs(9) = -min_VCMAX;
 objs(10) = PFPF;
 """
 
-main_directory = 'Test_interactive_1'
+main_directory = 'Test_interactive_GAA'
 
-objectives = [3]
+objectives = [11]
 #objectives = [2,3]
 #objectives = [2,3,5]
 #objectives = [2,3,4,5,6,8,10]
 #objectives = [3,5,6,8,10]
 #objectives = [3,5,6,8,10]
 
-problems = ['DTLZ5']
-#problems = ['GAA']
+#problems = ['DTLZ5']
+problems = ['GAA']
 #problems = ['DTLZ2','DTLZ4','DTLZ5','DTLZ6','DTLZ7']
 #problems = ['P1','P2']
 #problems = ['P1']
 #problems = ['WELDED_BEAM'] #dims=4
 #problems = ['TRUSS2D'] #dims=3
 
+#approaches = ["interactive_uncertainty"]
 approaches = ["interactive_uncertainty"]
-#approaches = ["interactive_uncertainty_new"]
 
 sampling = ['LHS']
 #sampling = ['MVNORM']
 #sampling = ['LHS', 'MVNORM']
 
 #emo_algorithm = ['RVEA','IBEA']
-emo_algorithm = ['RVEA']
-#emo_algorithm = ['ProbRVEA']
+#emo_algorithm = ['RVEA']
+emo_algorithm = ['ProbRVEA_1']
 #emo_algorithm = ['IBEA']
 #emo_algorithm = ['NSGAIII']
 #emo_algorithm = ['MODEL_CV']
@@ -125,7 +127,7 @@ for samp in sampling:
                         #   tgm.send(msg='Finished Testing: \n' + path_to_file)
                         except Exception as e:
                         #    tgm.send(msg='Error occurred : \n' + path_to_file + '\n' + str(e))
-                            print(e)        
+                            print(str(e) + "______" + traceback.format_exc())        
                         #for run in range(nruns):
                         #    parallel_execute(run, path_to_file)
 #tgm.send(msg='All tests completed successfully')
