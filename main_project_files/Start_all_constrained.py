@@ -11,21 +11,21 @@ import pandas as pd
 import numpy as np
 
 data_folder = '/home/amrzr/Work/Codes/data'
-results_folder = 'Test_constrained_2'
+results_folder = 'Test_constrained_4'
 init_folder = data_folder + '/constraint_handling_dataset'
 
-#file_exists_check = True
-file_exists_check = False
+file_exists_check = True
+#file_exists_check = False
 
-#evaluate_data = True
-evaluate_data = False
+evaluate_data = True
+#evaluate_data = False
 
 
 problem_testbench = 'DTLZ'
 #problem_testbench = 'DDMOPP'
 #problem_testbench = 'GAA'
 
-file_instances = init_folder + '/test_instances.csv'
+file_instances = init_folder + '/test_instances2.csv'
 data_instances = pd.read_csv(file_instances)
 all_problems = data_instances["problem"].values
 all_n_vars = data_instances["nvars"].values
@@ -55,7 +55,7 @@ all_bound_valL = [0.2]
 all_bound_valU = [0.9]
 """
 
-approaches = ["genericRVEA"] #,"probRVEA","probRVEA_constraint_v1","probRVEA_constraint_v2"]
+approaches = ["genericRVEA","probRVEA","probRVEA_constraint_v1","probRVEA_constraint_v2"]
 
 size_instance = np.size(all_problems)
 
@@ -64,8 +64,8 @@ interactive = False
 #############################################
 
 
-nruns = 1
-parallel_jobs = 4
+nruns = 11
+parallel_jobs = 3
 log_time = str(datetime.datetime.now())
 
 

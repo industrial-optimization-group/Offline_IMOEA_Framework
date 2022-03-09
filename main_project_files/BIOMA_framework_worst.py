@@ -65,14 +65,15 @@ def compute_nadir(population):
     return max_gen
 
 
-def full_optimize(problem, classification_model, gen_per_iter, max_iter, selection_type):
+def full_optimize(problem, classification_model, gen_per_iter, max_iter, FE_max, selection_type):
     if selection_type == 'prob_only':
         evolver_opt = ProbRVEAv0_pump(classification_model=classification_model, 
                                     problem=problem, 
                                     use_surrogates=True, 
                                     interact=False, 
                                     n_gen_per_iter=gen_per_iter, 
-                                    n_iterations=max_iter)
+                                    n_iterations=max_iter,
+                                    total_function_evaluations=FE_max)
     
     elif selection_type == 'prob_class_v1':
         evolver_opt = ProbRVEAv1_pump(classification_model=classification_model, 
@@ -80,20 +81,23 @@ def full_optimize(problem, classification_model, gen_per_iter, max_iter, selecti
                                     use_surrogates=True, 
                                     interact=False, 
                                     n_gen_per_iter=gen_per_iter, 
-                                    n_iterations=max_iter)
+                                    n_iterations=max_iter,
+                                    total_function_evaluations=FE_max)
     elif selection_type == 'prob_class_v2':
         evolver_opt = ProbRVEAv2_pump(classification_model=classification_model, 
                                     problem=problem, 
                                     use_surrogates=True, 
                                     interact=False, 
                                     n_gen_per_iter=gen_per_iter, 
-                                    n_iterations=max_iter)
+                                    n_iterations=max_iter,
+                                    total_function_evaluations=FE_max)
     else:
         evolver_opt = RVEA(problem, 
                         use_surrogates=True,
                         interact=False, 
                         n_gen_per_iter=gen_per_iter, 
-                        n_iterations=max_iter)    
+                        n_iterations=max_iter,
+                        total_function_evaluations=FE_max)    
 
     while evolver_opt.continue_evolution():
         evolver_opt.iterate()

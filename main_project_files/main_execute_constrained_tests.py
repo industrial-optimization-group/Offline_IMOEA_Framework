@@ -25,9 +25,9 @@ from BIOMA_framework_worst import full_optimize
 import copy
 
 
-
-max_iters = 5 #50
-gen_per_iter= 10 #10
+FE_max = 4000
+max_iters = 10 #50
+gen_per_iter= 100 #10
 is_interact = False
 read_saved_models = False
 
@@ -131,7 +131,7 @@ def run_optimizer_approach_interactive(problem, classification_model, path):
 
 def run_optimizer_approach_full(problem, classification_model, selection_type):
     print("Optimizing...")
-    evolver_opt = full_optimize(problem, classification_model, gen_per_iter, max_iters, selection_type)
+    evolver_opt = full_optimize(problem, classification_model, gen_per_iter, max_iters, FE_max, selection_type)
     return evolver_opt.population
 
 

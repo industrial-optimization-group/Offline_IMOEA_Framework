@@ -296,6 +296,7 @@ class RVEA(BaseDecompositionEA):
         self.population.keep(selected)
         self._current_gen_count += 1
         self._gen_count_in_curr_iteration += 1
+        print("FE=",self._function_evaluation_count)
     
     def _select(self, classification_probability) -> list:
         return self.selection_operator.do(self.population,self.reference_vectors,classification_probability)
