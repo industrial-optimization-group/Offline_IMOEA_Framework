@@ -21,19 +21,25 @@ evaluate_data = True
 #evaluate_data = False
 
 
-problem_testbench = 'DTLZ'
-#problem_testbench = 'DDMOPP'
+#problem_testbench = 'DTLZ'
+problem_testbench = 'DBMOPP'
 #problem_testbench = 'GAA'
 
-file_instances = init_folder + '/test_instances2.csv'
+#file_instances = init_folder + '/test_instances2.csv'
+file_instances = init_folder + '/test_instances_DBMOPP2.csv'
+
 data_instances = pd.read_csv(file_instances)
 all_problems = data_instances["problem"].values
 all_n_vars = data_instances["nvars"].values
 all_objs = data_instances["K"].values
 all_sample_size = data_instances["N"].values
-all_ndim = data_instances["ndim"].values
-all_bound_valL = data_instances["bound_valL"].values
-all_bound_valU = data_instances["bound_valU"].values
+if problem_testbench == 'DTLZ':
+    all_ndim = data_instances["ndim"].values
+    all_bound_valL = data_instances["bound_valL"].values
+    all_bound_valU = data_instances["bound_valU"].values
+else:
+    all_n_global_pareto_regions = data_instances["n_global_pareto_regions"].values
+    all_constraint_type = data_instances["constraint_type"].values
 
 """
 all_problems = ['DTLZ2']
@@ -64,8 +70,8 @@ interactive = False
 #############################################
 
 
-nruns = 11
-parallel_jobs = 3
+nruns = 1
+parallel_jobs = 1
 log_time = str(datetime.datetime.now())
 
 
@@ -76,13 +82,19 @@ def parallel_execute(run, instance, approach):
     obj = all_objs[instance]
     #samp = all_sampling[instance]
     sample_size = all_sample_size[instance]
-    ndim = all_ndim[instance]
-    bound_valL = all_bound_valL[instance]
-    bound_valU = all_bound_valU[instance]
-
-    problem_spec = prob +'_'+ str(sample_size) + '_' + str(obj) + '_' + \
+    if problem_testbench == 'DTLZ':
+        ndim = all_ndim[instance]
+        bound_valL = all_bound_valL[instance]
+        bound_valU = all_bound_valU[instance]
+        problem_spec = prob +'_'+ str(sample_size) + '_' + str(obj) + '_' + \
                     str(n_vars) +  '_b'+str(ndim) +'_' + str(bound_valL).replace('.','') + \
                         str(bound_valU).replace('.','')
+    else:
+        n_global_pareto_regions = all_n_global_pareto_regions[instance]
+        constraint_type = all_constraint_type[instance]
+        problem_spec = prob +'_'+ str(sample_size) + '_' + str(obj) + '_' + \
+        str(n_vars) +  '_b'+str(n_global_pareto_regions) +'_' + str(constraint_type)
+    
 
     path_to_file = data_folder + '/test_runs/'+  results_folder \
                 + '/' + approach + '/' + problem_spec
@@ -96,7 +108,7 @@ def parallel_execute(run, instance, approach):
         print("Creating Directory...")
 
     if evaluate_data is False:
-        if (problem_testbench == 'DTLZ' and obj < n_vars) or problem_testbench == 'DDMOPP':
+        if (problem_testbench == 'DTLZ' and obj < n_vars) or problem_testbench == 'DBMOPP':
             path_to_file = path_to_file + '/Run_' + str(run)
             if os.path.exists(path_to_file) is False or file_exists_check is False:
                 print('Starting Run!')
@@ -125,14 +137,25 @@ def parallel_execute(run, instance, approach):
                     print('File already exists!')
     else:
         try:
-            mexeConst.evaluate_population(path_to_folder = path_to_file,
-                                            problem_name = prob,
-                                            nvars = n_vars,
-                                            nobjs = obj,
-                                            ndim = ndim,
-                                            bound_valL = bound_valL,
-                                            bound_valU = bound_valU,
-                                            run=run)
+            if problem_testbench == 'DTLZ':
+                mexeConst.evaluate_population_DTLZ(path_to_folder = path_to_file,
+                                                problem_name = prob,
+                                                nvars = n_vars,
+                                                nobjs = obj,
+                                                ndim = ndim,
+                                                bound_valL = bound_valL,
+                                                bound_valU = bound_valU,
+                                                run=run)
+            else:
+                mexeConst.evaluate_population_DBMOPP(init_folder = init_folder,
+                                                problem_spec = problem_spec,
+                                                path_to_folder = path_to_file,
+                                                problem_name = prob,
+                                                nvars = n_vars,
+                                                nobjs = obj,
+                                                n_global_pareto_regions = n_global_pareto_regions,
+                                                constraint_type = constraint_type,
+                                                run=run)                
             
         except Exception as e:
             print(e)

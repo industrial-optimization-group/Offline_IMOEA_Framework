@@ -45,7 +45,7 @@ results_folder = 'Test_constrained_4'
 init_folder = data_folder + '/constraint_handling_dataset'
 
 problem_testbench = 'DTLZ'
-#problem_testbench = 'DDMOPP'
+#problem_testbench = 'DBMOPP'
 
 file_instances = init_folder + '/test_instances2.csv'
 data_instances = pd.read_csv(file_instances)
@@ -173,7 +173,7 @@ for instance in range(size_instance):
                 """
 
             else:
-                if problem_testbench == 'DDMOPP':
+                if problem_testbench == 'DBMOPP':
                     r0=np.ones(obj)
                     r1=np.ones(obj)*-1
                     dx=distance.euclidean(r0,r1)

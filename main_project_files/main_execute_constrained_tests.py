@@ -25,7 +25,7 @@ from BIOMA_framework_worst import full_optimize
 import copy
 
 
-FE_max = 4000
+FE_max = 500
 max_iters = 10 #50
 gen_per_iter= 100 #10
 is_interact = False
@@ -86,7 +86,7 @@ def build_surrogates(problem_testbench, init_folder, nvars, nobjs, problem_spec,
     y_names = [f'f{i}' for i in range(1,nobjs+1)]
     row_names = ['lower_bound','upper_bound']
     data = pd.DataFrame(np.hstack((x_data_success,y_data_success)), columns=x_names+y_names)
-    if problem_testbench == 'DDMOPP':
+    if problem_testbench == 'DBMOPP':
         x_low = np.ones(nvars)*-1
         x_high = np.ones(nvars)
     elif problem_testbench == 'DTLZ':
@@ -135,7 +135,7 @@ def run_optimizer_approach_full(problem, classification_model, selection_type):
     return evolver_opt.population
 
 
-def evaluate_population(path_to_folder, problem_name, nvars, nobjs, ndim, bound_valL, bound_valU, run):
+def evaluate_population_DTLZ(path_to_folder, problem_name, nvars, nobjs, ndim, bound_valL, bound_valU, run):
     
     infile = open(path_to_folder + '/Run_' + str(run), 'rb')
     results_data = pickle.load(infile)
@@ -144,8 +144,10 @@ def evaluate_population(path_to_folder, problem_name, nvars, nobjs, ndim, bound_
     surrogate_objectives = results_data["obj_solutions"]
 
     N = np.shape(individuals)[0]
+    
     boundoldL= 0 # for DTLZ
-    boundoldU = 1    
+    boundoldU = 1
+
     boundvecL = bound_valL* np.ones(nvars)
     boundvecU = bound_valU* np.ones(nvars)
     boundvecL = boundoldL* np.ones(nvars)
@@ -167,6 +169,76 @@ def evaluate_population(path_to_folder, problem_name, nvars, nobjs, ndim, bound_
     data_success = pd.DataFrame(np.hstack((individuals[np.where(stat_success==1)[0],:],underlying_obj_success)))
     data_all = pd.DataFrame(np.hstack((np.hstack((individuals, underlying_objectives)),stat_success)))
     data_surrogate = pd.DataFrame(np.hstack((np.hstack((individuals, surrogate_objectives)),stat_success)))
+    data_class.to_csv(path_to_folder + '/Run_'+ str(run)+ '_data_class.csv',index=False)
+    data_success.to_csv(path_to_folder + '/Run_'+ str(run) + '_data_success.csv',index=False)
+    data_all.to_csv(path_to_folder + '/Run_'+ str(run) + '_data_all.csv',index=False)
+    data_surrogate.to_csv(path_to_folder + '/Run_'+ str(run) + '_data_surrogate.csv',index=False)
+
+def evaluate_population_DBMOPP(
+                                init_folder,
+                                problem_spec, 
+                                path_to_folder,
+                                problem_name,
+                                nvars, 
+                                nobjs, 
+                                n_global_pareto_regions, 
+                                constraint_type, 
+                                run
+                                ):
+    problem_folder = init_folder + '/DBMOPP/DBMOPP_problems'
+    infile = open(path_to_folder + '/Run_' + str(run), 'rb')
+    results_data = pickle.load(infile)
+    infile.close()
+    infile = open(problem_folder + '/'+ problem_spec, 'rb')
+    problem_data = pickle.load(infile)
+    infile.close()
+
+    problem = problem_data["simple_problem"]
+    testproblem = problem.generate_problem()
+
+    individuals = results_data["individuals_solutions"]
+    surrogate_objectives = results_data["obj_solutions"]
+
+    N = np.shape(individuals)[0]
+    
+    boundoldL= -1 # for DTLZ
+    boundoldU = 1
+
+    #boundvecL = bound_valL* np.ones(nvars)
+    #boundvecU = bound_valU* np.ones(nvars)
+    #boundvecL = boundoldL* np.ones(nvars)
+    #boundvecU = boundoldU* np.ones(nvars)
+    #boundvecL[:ndim]=np.ones(ndim)*bound_valL
+    #boundvecU[:ndim]=np.ones(ndim)*bound_valU
+    
+    #boundL = np.tile(boundvecL,(N,1))
+    #boundU = np.tile(boundvecU,(N,1))
+
+    #testproblem = test_problem_builder(problem_name, n_of_objectives= nobjs, n_of_variables=nvars)
+
+    
+    underlying_objectives = testproblem.evaluate(individuals)
+    
+    failed_loc = np.where(np.any(underlying_objectives[2]<=0, axis=1))
+    stat_success = np.ones((N,1))
+    stat_success[failed_loc,0]=0
+    underlying_objectives = underlying_objectives[0]
+    underlying_obj_success = underlying_objectives[np.where(stat_success==1)[0],:]
+
+    #data_failed=underlying_objectives[failed_loc[0],:]
+    #obj_vals = obj_val[0]
+    #obj_success = underlying_objectives[np.where(stat_success==1)[0],:]
+    
+    #failed_loc = np.where(np.all(individuals >= boundL, axis=1) & np.all(individuals <= boundU, axis=1))
+    #stat_success = np.ones((N,1))
+    #stat_success[failed_loc,0]=0
+    #underlying_obj_success = underlying_objectives[np.where(stat_success==1)[0],:]
+    
+    data_class = pd.DataFrame(np.hstack((individuals, stat_success)))
+    data_success = pd.DataFrame(np.hstack((individuals[np.where(stat_success==1)[0],:],underlying_obj_success)))
+    data_all = pd.DataFrame(np.hstack((np.hstack((individuals, underlying_objectives)),stat_success)))
+    data_surrogate = pd.DataFrame(np.hstack((np.hstack((individuals, surrogate_objectives)),stat_success)))
+    
     data_class.to_csv(path_to_folder + '/Run_'+ str(run)+ '_data_class.csv',index=False)
     data_success.to_csv(path_to_folder + '/Run_'+ str(run) + '_data_success.csv',index=False)
     data_all.to_csv(path_to_folder + '/Run_'+ str(run) + '_data_all.csv',index=False)
