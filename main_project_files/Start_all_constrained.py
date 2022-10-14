@@ -26,7 +26,7 @@ problem_testbench = 'DBMOPP'
 #problem_testbench = 'GAA'
 
 #file_instances = init_folder + '/test_instances2.csv'
-file_instances = init_folder + '/test_instances_DBMOPP2.csv'
+file_instances = init_folder + '/test_instances_DBMOPP.csv'
 
 data_instances = pd.read_csv(file_instances)
 all_problems = data_instances["problem"].values
@@ -70,8 +70,8 @@ interactive = False
 #############################################
 
 
-nruns = 1
-parallel_jobs = 1
+nruns = 11
+parallel_jobs = 3
 log_time = str(datetime.datetime.now())
 
 

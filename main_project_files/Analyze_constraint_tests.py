@@ -48,14 +48,21 @@ problem_testbench = 'DTLZ'
 #problem_testbench = 'DBMOPP'
 
 file_instances = init_folder + '/test_instances2.csv'
+#file_instances = init_folder + '/test_instances_DBMOPP.csv'
+
+
 data_instances = pd.read_csv(file_instances)
 all_problems = data_instances["problem"].values
 all_n_vars = data_instances["nvars"].values
 all_objs = data_instances["K"].values
 all_sample_size = data_instances["N"].values
-all_ndim = data_instances["ndim"].values
-all_bound_valL = data_instances["bound_valL"].values
-all_bound_valU = data_instances["bound_valU"].values
+if problem_testbench == 'DTLZ':
+    all_ndim = data_instances["ndim"].values
+    all_bound_valL = data_instances["bound_valL"].values
+    all_bound_valU = data_instances["bound_valU"].values
+else:
+    all_n_global_pareto_regions = data_instances["n_global_pareto_regions"].values
+    all_constraint_type = data_instances["constraint_type"].values
 
 """
 all_problems = ['DTLZ2']
@@ -76,7 +83,8 @@ all_bound_valL = [0.2]
 
 all_bound_valU = [0.9]
 """
-approaches = ["genericRVEA","probRVEA","probRVEA_constraint_v1","probRVEA_constraint_v2"]
+#approaches = ["genericRVEA","probRVEA","probRVEA_constraint_v1","probRVEA_constraint_v2"]
+approaches = ["genericRVEA","probRVEA","probRVEA_constraint_v2"]
 no_of_approaches = len(approaches)
 
 size_instance = np.size(all_problems)
@@ -120,9 +128,13 @@ for instance in range(size_instance):
     n_vars = all_n_vars[instance]
     obj = all_objs[instance]
     sample_size = all_sample_size[instance]
-    ndim = all_ndim[instance]
-    bound_valL = all_bound_valL[instance]
-    bound_valU = all_bound_valU[instance]
+    if problem_testbench == 'DTLZ':
+        ndim = all_ndim[instance]
+        bound_valL = all_bound_valL[instance]
+        bound_valU = all_bound_valU[instance]
+    else:
+        n_global_pareto_regions = all_n_global_pareto_regions[instance]
+        constraint_type = all_constraint_type[instance]        
     
     #fig = plt.figure(1, figsize=(10, 10))
     fig = plt.figure()
@@ -134,9 +146,13 @@ for instance in range(size_instance):
     success_ratio_all = None
     solution_ratio_all = None
     for approach, approach_count in zip(approaches,range(np.shape(approaches)[0])):
-        problem_spec = prob +'_'+ str(sample_size) + '_' + str(obj) + '_' + \
-                        str(n_vars) +  '_b'+str(ndim) +'_' + str(bound_valL).replace('.','') + \
-                            str(bound_valU).replace('.','')
+        if problem_testbench == 'DTLZ':
+            problem_spec = prob +'_'+ str(sample_size) + '_' + str(obj) + '_' + \
+                            str(n_vars) +  '_b'+str(ndim) +'_' + str(bound_valL).replace('.','') + \
+                                str(bound_valU).replace('.','')
+        else:
+            problem_spec = prob +'_'+ str(sample_size) + '_' + str(obj) + '_' + \
+                            str(n_vars) +  '_b'+str(n_global_pareto_regions) +'_' + str(constraint_type)
 
         path_to_folder = data_folder + '/test_runs/'+  results_folder \
                     + '/' + approach + '/' + problem_spec
@@ -184,31 +200,36 @@ for instance in range(size_instance):
                 if np.shape(y_data_success)[0] > 1:
                     non_dom_front = ndx(y_data_success)
                     actual_objectives_nds = y_data_success[non_dom_front[0][0]]
-                else:
+                elif np.shape(y_data_success)[0] == 1:
                     actual_objectives_nds = y_data_success.reshape(1, obj)
-                
-                print("No. of non-dominated solutions:", np.shape(actual_objectives_nds)[0])
+                else:
+                    actual_objectives_nds = None
+                    hv_x = 0
+                    success_ratio_temp = 0
+
                 solution_ratio = 0
-                hyp = hv(actual_objectives_nds)
-                hv_x = hyp.compute(ref)
-                print("Hypervolume:",hv_x)
-                if plot_scatter:
-                    fig1 = plt.figure()
-                    fig1.scatter(y_data_success[:,0],y_data_success[:,1],c='blue')
-                    fig1.scatter(actual_objectives_nds[:,0], actual_objectives_nds[:,1], c='red')
-                    filename_figx = data_folder + '/test_runs/'+  results_folder \
-                    + '/plots/' + problem_spec + '_' + approach + '_' + str(run)
-                    fig1.savefig(filename_figx + '.pdf', bbox_inches='tight')
-                    #ax.clear()
+                if actual_objectives_nds is not None:
+                    print("No. of non-dominated solutions:", np.shape(actual_objectives_nds)[0])                    
+                    hyp = hv(actual_objectives_nds)
+                    hv_x = hyp.compute(ref)
+                    print("Hypervolume:",hv_x)
+                    if plot_scatter:
+                        fig1 = plt.figure()
+                        fig1.scatter(y_data_success[:,0],y_data_success[:,1],c='blue')
+                        fig1.scatter(actual_objectives_nds[:,0], actual_objectives_nds[:,1], c='red')
+                        filename_figx = data_folder + '/test_runs/'+  results_folder \
+                        + '/plots/' + problem_spec + '_' + approach + '_' + str(run)
+                        fig1.savefig(filename_figx + '.pdf', bbox_inches='tight')
+                        #ax.clear()
                 
-                ##### RMSE
-                for i in range(np.shape(y_data_surrogate_success)[0]):
-                    rmse_mv_sols += distance.euclidean(y_data_surrogate_success[i,:],y_data_success[i,:])
-                rmse_mv_sols = rmse_mv_sols/np.shape(y_data_surrogate_success)[0]
-                print("MV-RMSE:", rmse_mv_sols)
-                ##### Success ratio
-                success_ratio_temp = np.shape(y_data_surrogate_success)[0] / np.shape(y_data_surrogate)[0]
-                print("Success ratio:", success_ratio_temp)
+                    ##### RMSE
+                    for i in range(np.shape(y_data_surrogate_success)[0]):
+                        rmse_mv_sols += distance.euclidean(y_data_surrogate_success[i,:],y_data_success[i,:])
+                    rmse_mv_sols = rmse_mv_sols/np.shape(y_data_surrogate_success)[0]
+                    print("MV-RMSE:", rmse_mv_sols)
+                    ##### Success ratio
+                    success_ratio_temp = np.shape(y_data_surrogate_success)[0] / np.shape(y_data_surrogate)[0]
+                    print("Success ratio:", success_ratio_temp)
 
                 return [hv_x, solution_ratio, rmse_mv_sols, success_ratio_temp]
 
@@ -287,7 +308,10 @@ for instance in range(size_instance):
                                             returnsorted=False)
         r, p_cor_time, alps, alpb = multipletests(p_value_time, alpha=0.05, method='bonferroni', is_sorted=False,
                                             returnsorted=False)
-    current_index = [prob, n_vars, obj, sample_size, ndim, bound_valL, bound_valU]
+    if problem_testbench == 'DTLZ':
+        current_index = [prob, n_vars, obj, sample_size, ndim, bound_valL, bound_valU]
+    else:
+        current_index = [prob, n_vars, obj, sample_size, n_global_pareto_regions, constraint_type]
     ranking_hv = calc_rank(p_cor_hv, np.median(igd_all, axis=0),no_of_approaches)
     ranking_rmse = calc_rank(p_cor_rmse, np.median(rmse_all, axis=0)*-1,no_of_approaches)
     ranking_time = calc_rank(p_cor_time, np.median(success_ratio_all, axis=0),no_of_approaches)

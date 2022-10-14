@@ -11,10 +11,11 @@ rc('text', usetex=True)
 plt.rcParams.update({'font.size': 15})
 #sns.set(font_scale=1.2)
 
-#testbench = "DDMOPP"
-testbench = "DTLZ"
+testbench = "DDMOPP"
+#testbench = "DTLZ"
 comparison = 'HV'
 #comparison = 'RMSE'
+folder = '/home/amrzr/Work/Codes/Offline_IMOEA_Framework/probabilistic_analysis/'
 summary = []
 
 #approaches = ['Init','Gen','TL','Prob','Hyb']
@@ -24,13 +25,13 @@ summary = []
 
 if comparison is 'HV':
     approaches = ['Init','TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Gen-MOEA/D','Prob-MOEA/D','Hyb-MOEA/D']
-    path_to_file = "HV_heatmap_"+testbench+".csv"
+    path_to_file = folder+"HV_heatmap_"+testbench+".csv"
     with open(path_to_file, 'r') as f:
         reader = csv.reader(f)
         for line in reader: summary.append(line)
 else:
     approaches = ['TL','Gen-RVEA','Prob-RVEA','Hyb-RVEA','Gen-MOEA/D','Prob-MOEA/D','Hyb-MOEA/D']
-    path_to_file = "RMSE_heatmap_"+testbench+".csv"
+    path_to_file = folder+"RMSE_heatmap_"+testbench+".csv"
     with open(path_to_file, 'r') as f:
         reader = csv.reader(f)
         for line in reader: summary.append(line)
@@ -57,7 +58,7 @@ if comparison is 'HV':
 else:
     summary_df2=summary_df2[approaches]
 print(summary_df2)
-color_map = plt.cm.get_cmap('viridis')
+color_map = plt.cm.get_cmap('plasma')
 reversed_color_map = color_map.reversed()
 reversed_color_map = reversed_color_map(np.linspace(0,1,(len(approaches))))
 reversed_color_map = matcol.ListedColormap(reversed_color_map)
@@ -68,5 +69,5 @@ colorbar.set_ticks([1, len(approaches)])
 colorbar.set_ticklabels(['Best', 'Worst'])
 fig = ax.get_figure()
 #fig.show()
-filename_fig = 'Heatmap_'+comparison+'_'+testbench
+filename_fig = 'Heatmap_magma_'+comparison+'_'+testbench
 fig.savefig(filename_fig + '.pdf', bbox_inches='tight')

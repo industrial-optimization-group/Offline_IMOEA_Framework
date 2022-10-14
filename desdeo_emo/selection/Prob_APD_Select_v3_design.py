@@ -10,7 +10,7 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 
-class Prob_APD_select_v3(SelectionBase):
+class Prob_APD_select_v3_design(SelectionBase):
     """The selection operator for the RVEA algorithm. Read the following paper for more
         details.
         R. Cheng, Y. Jin, M. Olhofer and B. Sendhoff, A Reference Vector Guided
@@ -27,26 +27,14 @@ class Prob_APD_select_v3(SelectionBase):
     """
 
     def __init__(
-        self, pop: Population, time_penalty_function: Callable, alpha: float = 2
+        self,  design_samples, pop: Population, time_penalty_function: Callable, alpha: float = 2
     ):
         self.time_penalty_function = time_penalty_function
         self.alpha = alpha
         self.n_of_objectives = pop.problem.n_of_objectives
 
-    def do(self, pop: Population, vectors: ReferenceVectors) -> List[int]:
-
-
-        #def Prob_APD_select_v3(
-        #    fitness: list,
-        #    uncertainty: list,
-        #    vectors: "ReferenceVectors",
-        #    penalty_factor: float,
-        #    ideal: list = None,
-        #):\
-        #if np.shape(pop.fitness)[0] < self.thresh_size:
-        #    fitness = pop.objectives_archive
-        #    uncertainty = pop.uncertainty_archive
-        #else:
+    def do(self, pop: Population, vectors: ReferenceVectors, design_samples) -> List[int]:
+        n_samples=100
         fitness = pop.fitness
         uncertainty = pop.uncertainity
         penalty_factor = self._partial_penalty_factor()
@@ -54,9 +42,11 @@ class Prob_APD_select_v3(SelectionBase):
         refV = vectors.neighbouring_angles_current
         fmin = np.amin(fitness, axis=0)
         translated_fitness = fitness - fmin
-        pwrong = Probability_wrong(mean_values=translated_fitness, stddev_values=uncertainty, n_samples=1000)
-        pwrong.vect_sample_f()
-
+        pwrong = Probability_wrong(mean_values=translated_fitness, stddev_values=uncertainty, n_samples=n_samples)
+        #pwrong.vect_sample_f()
+        len_f = fitness.shape[0]
+        fmin_vect = np.repeat(np.tile(fmin.reshape(1,-1),(len_f,1)).reshape(len_f,2,1),n_samples,axis=2)
+        pwrong.f_samples = design_samples - fmin_vect
         fitness_norm = np.linalg.norm(pwrong.f_samples, axis=1)
         fitness_norm = np.repeat(np.reshape(fitness_norm, (len(fitness), 1, pwrong.n_samples)), len(fitness[0, :]), axis=1)
 
@@ -100,13 +90,11 @@ class Prob_APD_select_v3(SelectionBase):
                 sub_popfm = np.reshape(sub_pop_fitness_magnitude, (1, len(sub_pop_fitness_magnitude[:,0]), pwrong.n_samples))
                 angles = np.reshape(angles,(1,len(angles),pwrong.n_samples))
 
-
-                #### Overall Mean/Median of apd
                 apd = np.multiply(
                     sub_popfm,
                     (1 + np.dot(penalty_factor, angles))
                 )
-                #rank_apd = np.mean(apd, axis=2)
+
                 rank_apd = pwrong.compute_rank_MC(apd)
                 minidx = np.where(rank_apd[0] == np.nanmin(rank_apd[0]))
 
